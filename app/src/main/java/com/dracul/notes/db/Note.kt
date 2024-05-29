@@ -1,14 +1,16 @@
 package com.dracul.notes.db
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Immutable
 @Entity
 data class Note(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
     val title: String,
     val content: String,
     val color: Int,
-    val pinned:Boolean = false,
+    val pinned: Boolean = false,
 )

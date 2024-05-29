@@ -1,59 +1,92 @@
 package com.dracul.notes.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dracul.notes.navigation.CreateNoteComponent
-import com.dracul.notes.viewmodels.CreateViewModel
+import com.dracul.notes.navigation.events.CreateNoteEvent.Back
+import com.dracul.notes.navigation.events.CreateNoteEvent.UpdateContent
+import com.dracul.notes.navigation.events.CreateNoteEvent.UpdateTitle
+import com.dracul.notes.navigation.events.EditNoteEvent
+import com.dracul.notes.navigation.events.EditNoteEvent.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateNoteScreen(
-    component: CreateNoteComponent
+    component: CreateNoteComponent,
 ) {
-    var title by remember {
-        mutableStateOf("")
-    }
-    var content by remember {
-        mutableStateOf("")
-    }
+    val title = component.title
+    val content = component.content
     Scaffold(
+        modifier = Modifier.background(Color.Red),
         topBar = {
             TopAppBar(
                 title = { Text(text = "Create Note") },
-                navigationIcon = { IconButton({ component. }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
+                navigationIcon = { IconButton({ component.onEvent(Back) }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
             )
         }
-    ) {padding->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-        ) {
-            TextField(value = title , onValueChange = {title = it} , modifier = Modifier.fillMaxWidth())
-            TextField(value = content , onValueChange = {content = it}, modifier = Modifier.fillMaxSize() )
+                .padding(top = padding.calculateTopPadding()),
+
+            ) {
+            OutlinedTextField(
+                placeholder = { Text(text = "Title") },
+                value = title.value,
+                onValueChange = { component.onEvent(UpdateTitle(it)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                ),
+                textStyle = TextStyle(fontSize = 24.sp)
+            )
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            OutlinedTextField(
+                placeholder = { Text(text = "Content") },
+                value = content.value,
+                onValueChange = { component.onEvent(UpdateContent(it)) },
+                modifier = Modifier
+                    .fillMaxSize(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                ),
+                textStyle = TextStyle(fontSize = 22.sp),
+
+                )
         }
     }
 
 }
+

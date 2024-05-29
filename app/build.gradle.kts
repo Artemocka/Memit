@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.decompose.jetbrains)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.decompose)
     implementation("androidx.room:room-runtime:2.6.1")

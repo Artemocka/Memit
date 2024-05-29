@@ -31,4 +31,6 @@ interface NoteDao {
 
     @Delete
     fun delete(item: Note)
+    @Query("DELETE FROM Note where id=  :id")
+    fun deleteById(id: Long)
 }

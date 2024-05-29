@@ -5,54 +5,51 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.dracul.notes.db.Note
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.arkivanov.decompose.retainedComponent
+import com.dracul.notes.navigation.RootComponent
 import com.dracul.notes.ui.screens.CreateNoteScreen
 import com.dracul.notes.ui.screens.EditNoteScreen
 import com.dracul.notes.ui.screens.MainScreen
 import com.dracul.notes.ui.theme.NotesTheme
 import com.example.myapplication.DatabaseProviderWrap
-import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DatabaseProviderWrap.createDao(this.application)
-        DatabaseProviderWrap.noteDao.insert(Note(id = 0, color = 0, title = "Список покупок", pinned = false, content = "Помидоры\nОгурцы и тд\n\na"))
+        val root = retainedComponent {
+            RootComponent(it)
+        }
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            NotesTheme {
-
-                val navController = rememberNavController()
-                NavHost(navController, startDestination = Home) {
-                    composable<Home> {
-                        MainScreen( navController = navController)
-                    }
-                    composable<CreateNote> {
-                        CreateNoteScreen(navController = navController)
-                    }
-                    composable<EditNote> {backStackEntry->
-                        val id = backStackEntry.toRoute<EditNote>().id
-                        EditNoteScreen(id = id,navController = navController)
-                    }
-                }
-            }
+            App(root = root)
         }
     }
 }
 
-@Serializable
-object Home
-
-@Serializable
-object CreateNote
-
-@Serializable
-data class EditNote(val id: Long)
+@Composable
+fun App(root: RootComponent) {
+    NotesTheme {
+        val childStack by root.childStack.subscribeAsState()
+        Children(
+            stack = childStack,
+            animation = stackAnimation(slide())
+        ) { child ->
+            when (val instance = child.instance) {
+                is RootComponent.Child.CreateNote -> CreateNoteScreen(instance.component)
+                is RootComponent.Child.MainScreen -> MainScreen(instance.component)
+                is RootComponent.Child.EditNote -> EditNoteScreen(component = instance.component)
+            }
+        }
+    }
+}

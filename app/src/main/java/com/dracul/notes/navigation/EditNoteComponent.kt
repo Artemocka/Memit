@@ -5,54 +5,54 @@ import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.notes.db.Note
-import com.dracul.notes.navigation.events.CreateNoteEvent
+import com.dracul.notes.navigation.events.EditNoteEvent
 import com.example.myapplication.DatabaseProviderWrap
 
-class CreateNoteComponent(
+class EditNoteComponent(
+    id: Long,
     componentContext: ComponentContext,
     private val onGoBack: () -> Unit,
 ) : ComponentContext by componentContext {
 
-
-    private var _title = mutableStateOf("")
-    private var _content = mutableStateOf("")
+    private var note = DatabaseProviderWrap.noteDao.getById(id)
+    private var _title = mutableStateOf(note.title)
+    private var _content = mutableStateOf(note.content)
     val title: State<String> = _title
     val content: State<String> = _content
 
-    private val backCallback = BackCallback {
-        val note = Note(0, _title.value, _content.value, 0, false)
-        note.isEmptyOrSave()
+    private val backCallback = BackCallback(priority = Int.MAX_VALUE){
+        note = note.copy(title = _title.value, content = _content.value)
+        note.isEmptyOrUpdate()
     }
 
     init {
         backHandler.register(backCallback)
     }
 
-
-    fun onEvent(event: CreateNoteEvent) {
+    fun onEvent(event: EditNoteEvent) {
         when (event) {
-            is CreateNoteEvent.UpdateTitle -> {
+            is EditNoteEvent.UpdateTitle -> {
                 _title.value = event.text
             }
 
-            is CreateNoteEvent.UpdateContent -> {
+            is EditNoteEvent.UpdateContent -> {
                 _content.value = event.text
             }
 
-            is CreateNoteEvent.Back -> {
-                val note = Note(0, _title.value, _content.value, 0, false)
-                note.isEmptyOrSave()
+            is EditNoteEvent.Back -> {
+                note = note.copy(title = _title.value, content = _content.value)
+                note.isEmptyOrUpdate()
             }
+
         }
     }
 
-    private fun Note.isEmptyOrSave() {
+    private fun Note.isEmptyOrUpdate() {
         if (this.title.isEmpty() && this.content.isEmpty()) {
             onGoBack()
         } else {
-            DatabaseProviderWrap.noteDao.insert(this)
+            DatabaseProviderWrap.noteDao.update(this)
             onGoBack()
         }
     }
-
 }

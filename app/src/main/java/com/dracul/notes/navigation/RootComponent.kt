@@ -16,7 +16,7 @@ class RootComponent(
     val childStack = childStack(
         source = navigation,
         serializer = Configuration.serializer(),
-        initialConfiguration = Configuration.ScreenA,
+        initialConfiguration = Configuration.MainScreen,
         handleBackButton = true,
         childFactory = ::createChild
     )
@@ -25,21 +25,28 @@ class RootComponent(
         config: Configuration, context: ComponentContext
     ): Child {
         return when (config) {
-            Configuration.ScreenA -> Child.ScreenA(
+            Configuration.CreateNote -> Child.CreateNote(
                 CreateNoteComponent(
                     componentContext = context,
-                    onNavigationToScreenB = {text->
-                        navigation.pushNew(Configuration.ScreenB(text))
-
+                    onGoBack = {
+                        navigation.pop()
                     }
                 )
             )
 
-            is Configuration.ScreenB -> Child.ScreenB(
-                ScreenBComponent(
-                    text = config.text,
+            is Configuration.MainScreen -> Child.MainScreen(
+                MainComponent(
                     componentContext = context,
-                    onGoBack = { navigation.pop() }
+                    onCreateNote = { navigation.pushNew(Configuration.CreateNote) },
+                    onEditNote = { navigation.pushNew(Configuration.EditNote(it)) }
+                )
+            )
+
+            is Configuration.EditNote -> Child.EditNote(
+                EditNoteComponent(
+                    id = config.id,
+                    componentContext = context,
+                    onGoBack = { navigation.pop() },
                 )
             )
         }
@@ -47,16 +54,20 @@ class RootComponent(
 
 
     sealed class Child {
-        data class ScreenA(val component: CreateNoteComponent) : Child()
-        data class ScreenB(val component: ScreenBComponent) : Child()
+        data class CreateNote(val component: CreateNoteComponent) : Child()
+        data class MainScreen(val component: MainComponent) : Child()
+        data class EditNote(val component: EditNoteComponent) : Child()
     }
 
     @Serializable
     sealed class Configuration {
         @Serializable
-        data object ScreenA : Configuration()
+        data object CreateNote : Configuration()
 
         @Serializable
-        data class ScreenB(val text: String) : Configuration()
+        data class EditNote(val id: Long) : Configuration()
+
+        @Serializable
+        data object MainScreen : Configuration()
     }
 }
