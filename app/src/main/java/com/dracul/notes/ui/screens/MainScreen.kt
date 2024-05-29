@@ -68,29 +68,35 @@ fun MainScreen(
             columns = StaggeredGridCells.Adaptive(180.dp),
             contentPadding = padding,
         ) {
-            items(notes.value.size) { note ->
+
+
+
+            items(
+                count = notes.value.size,
+                key = {
+                    notes.value[it].id
+                }
+            ) { note ->
                 ItemGrid(
                     item = notes.value[note],
                     onItemClick = { id ->
                         component.onEvent(EditNote(id))
                     },
-                    onItemLongClick = { id ->
-                        component.onEvent(ShowBottomSheet(id))
-                    },
+
+                    onItemLongClick = {component.onEvent(ShowBottomSheet(it))},
                 )
             }
         }
-        if (showBottomSheet.value) {
-            BottomSheet(
-                onDismiss = {
-                    component.onEvent(HideBottomSheet)
-                },
-                onClick = {
-                    component.onEvent(it)
-                }
-            )
-        }
-
+    }
+    if (showBottomSheet.value) {
+        BottomSheet(
+            onDismiss = {
+                component.onEvent(HideBottomSheet)
+            },
+            onClick = {
+                component.onEvent(it)
+            }
+        )
     }
 }
 

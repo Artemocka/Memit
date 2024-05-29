@@ -5,8 +5,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.startActivity
 import com.arkivanov.decompose.ComponentContext
+import com.dracul.notes.db.Note
 import com.dracul.notes.navigation.events.MainEvent
 import com.example.myapplication.DatabaseProviderWrap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class MainComponent(
     componentContext: ComponentContext,
@@ -18,8 +23,10 @@ class MainComponent(
     private val _showBottomSheet = mutableStateOf(false)
     private var selectedItem: Long? = null
     val showBottomSheet: State<Boolean> = _showBottomSheet
-
-    val notes = DatabaseProviderWrap.noteDao.getAll()
+    lateinit var notes: Flow<List<Note>>
+    val job = CoroutineScope(Dispatchers.IO).launch {
+        notes = DatabaseProviderWrap.noteDao.getAll()
+    }
 
     fun onEvent(event: MainEvent) {
         when (event) {
@@ -49,8 +56,8 @@ class MainComponent(
 
             MainEvent.DuplicateNoteModal -> {
                 selectedItem?.let { id ->
-                    val tempNote = DatabaseProviderWrap.noteDao.getById(id).copy(id = 0)
-                    DatabaseProviderWrap.noteDao.insert(tempNote)
+                    val tempNote = DatabaseProviderWrap.noteDao.getById(id)
+                    DatabaseProviderWrap.noteDao.insert(tempNote.copy(id = 0))
                 }
                 _showBottomSheet.value = false
             }
