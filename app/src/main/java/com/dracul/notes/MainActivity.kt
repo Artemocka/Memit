@@ -5,23 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.EaseInBounce
-import androidx.compose.animation.core.EaseInCubic
-import androidx.compose.animation.core.EaseInExpo
+import androidx.activity.viewModels
 import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.EaseInOutElastic
-import androidx.compose.animation.core.EaseInOutExpo
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
@@ -31,12 +21,15 @@ import com.dracul.notes.ui.screens.CreateNoteScreen
 import com.dracul.notes.ui.screens.EditNoteScreen
 import com.dracul.notes.ui.screens.MainScreen
 import com.dracul.notes.ui.theme.NotesTheme
-import com.example.myapplication.DatabaseProviderWrap
+
 
 class MainActivity : ComponentActivity() {
+    private val activityViewModel by viewModels<ActivityViewModel>()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DatabaseProviderWrap.createDao(this.application)
+        activityViewModel
         val root = retainedComponent {
             RootComponent(it)
         }

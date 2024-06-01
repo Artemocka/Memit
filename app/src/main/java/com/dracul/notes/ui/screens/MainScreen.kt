@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
@@ -41,6 +40,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,7 +52,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +69,7 @@ import com.dracul.notes.navigation.events.MainEvent.EditNoteModal
 import com.dracul.notes.navigation.events.MainEvent.HideBottomSheet
 import com.dracul.notes.navigation.events.MainEvent.ShareNoteModal
 import com.dracul.notes.navigation.events.MainEvent.ShowBottomSheet
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,23 +84,9 @@ fun MainScreen(
     val longClickLambda = remember<(id: Long) -> Unit> {
         { component.onEvent(ShowBottomSheet(it)) }
     }
-    val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList(), lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current )
+    val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList(), lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current)
     val showBottomSheet = component.showBottomSheet
-    if (showBottomSheet.value) {
-        BottomSheet(
-            onDismiss = {
-                component.onEvent(HideBottomSheet)
-            },
-            onClick = {
-                component.onEvent(it)
-            },
-            onColorClick = {
-                component.onEvent(MainEvent.SetNoteColorModal(it))
-            },
-            colorList = component.colorsList
 
-        )
-    }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
@@ -111,7 +97,21 @@ fun MainScreen(
             TopAppBar(title = { Text(text = "Notes") })
         }
     ) { padding ->
+        if (showBottomSheet.value) {
+            BottomSheet(
+                onDismiss = {
+                    component.onEvent(HideBottomSheet)
+                },
+                onEvent = {
+                    component.onEvent(it)
+                },
+                onColorClick = {
+                    component.onEvent(MainEvent.SetNoteColorModal(it))
+                },
+                colorList = component.colorsList
 
+            )
+        }
         LazyVerticalStaggeredGrid(
             modifier = Modifier.padding(horizontal = 16.dp),
             columns = StaggeredGridCells.Adaptive(180.dp),
@@ -189,23 +189,26 @@ fun ItemGrid(
 @Composable
 fun BottomSheet(
     onDismiss: () -> Unit,
-    onClick: (event: MainEvent) -> Unit,
+    onEvent: (event: MainEvent) -> Unit,
     onColorClick: (CircleColor) -> Unit,
     colorList: State<List<CircleColor>>,
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState()
     val localContext = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+
     val editLambda = remember<() -> Unit> {
-        { onClick(EditNoteModal) }
+        { onEvent(EditNoteModal) }
     }
     val duplicateLambda = remember<() -> Unit> {
-        { onClick(DuplicateNoteModal) }
+        { onEvent(DuplicateNoteModal) }
     }
     val shareLambda = remember<() -> Unit> {
-        { onClick(ShareNoteModal(localContext)) }
+        { onEvent(ShareNoteModal(localContext)) }
     }
     val deleteLambda = remember<() -> Unit> {
-        { onClick(DeleteNoteModal) }
+        { onEvent(DeleteNoteModal) }
     }
 
 
@@ -217,22 +220,52 @@ fun BottomSheet(
 
         ) {
         val scrollState = rememberScrollState()
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(scrollState)
         ) {
-            repeat(colorList.value.size){
+            repeat(colorList.value.size) {
                 CircleColorItem(item = colorList.value[it], onClick = onColorClick)
             }
         }
-        BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = editLambda)
-        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy), text = "Duplicate", onClick = duplicateLambda)
-        BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = shareLambda)
-        BottomSheetRow(image = Icons.Filled.Delete, text = "Delete", onClick = deleteLambda)
-        Spacer(modifier = Modifier.height(8.dp))
+        BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = {
+            editLambda()
+            scope.launch {
+                modalBottomSheetState.hide()
+            }.invokeOnCompletion {
+                onEvent(HideBottomSheet)
+
+            }
+        })
+        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy), text = "Duplicate", onClick = {
+            duplicateLambda()
+            scope.launch {
+                modalBottomSheetState.hide()
+            }.invokeOnCompletion {
+                onEvent(HideBottomSheet)
+
+            }
+        })
+        BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = {
+            shareLambda()
+            scope.launch {
+                modalBottomSheetState.hide()
+            }.invokeOnCompletion {
+                onEvent(HideBottomSheet)
+
+            }
+        })
+        BottomSheetRow(image = Icons.Filled.Delete, text = "Delete", onClick = {
+            deleteLambda()
+            scope.launch {
+                modalBottomSheetState.hide()
+            }.invokeOnCompletion {
+                onEvent(HideBottomSheet)
+
+            }
+        })
+        Spacer(modifier = Modifier.height(14.dp))
     }
 }
 
@@ -268,7 +301,6 @@ fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
             .clickable { onClick(item) }
     )
 }
-
 
 
 @Composable

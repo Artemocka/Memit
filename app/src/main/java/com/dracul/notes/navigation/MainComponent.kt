@@ -47,6 +47,8 @@ class MainComponent(
                     val tempNote = DatabaseProviderWrap.noteDao.getById(it)
                     if (tempNote.color!=0){
                         _colorsList.value = circleColorList.getSelected(tempNote.color)
+                    }else{
+                        _colorsList.value = circleColorList.getColors()
                     }
                 }
                 _showBottomSheet.value = true
@@ -56,7 +58,6 @@ class MainComponent(
                 selectedItemId?.let { id ->
                     DatabaseProviderWrap.noteDao.deleteById(id)
                 }
-                _showBottomSheet.value = false
             }
 
             MainEvent.DuplicateNoteModal -> {
@@ -74,11 +75,8 @@ class MainComponent(
                         putExtra(Intent.EXTRA_TEXT, "${tempNote.title}\n${tempNote.content}")
                         type = "text/plain"
                     }
-
                     startActivity(event.context, Intent.createChooser(sendIntent, tempNote.title), null)
                 }
-
-
             }
 
             MainEvent.HideBottomSheet -> {
@@ -91,11 +89,14 @@ class MainComponent(
                     onEditNote(it)
                 }
                 selectedItemId = null
-                _showBottomSheet.value = false
             }
 
             is MainEvent.SetNoteColorModal -> {
                 _colorsList.value = circleColorList.getSelected(event.color)
+                selectedItemId?.let{
+                    val tempNote = DatabaseProviderWrap.noteDao.getById(it).copy(color = event.color.color)
+                    DatabaseProviderWrap.noteDao.update(tempNote)
+                }
             }
         }
     }
