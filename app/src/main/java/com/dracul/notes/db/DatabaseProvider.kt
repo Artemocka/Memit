@@ -2,6 +2,7 @@ package com.dracul.notes.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.dracul.notes.data.Note
 
 @Database(
     entities = [

@@ -1,17 +1,15 @@
 package com.dracul.notes.navigation
 
 import android.content.Intent
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.startActivity
 import com.arkivanov.decompose.ComponentContext
-import com.dracul.notes.db.Note
+import com.dracul.notes.data.CircleColor
+import com.dracul.notes.data.CircleColorList
 import com.dracul.notes.navigation.events.MainEvent
 import com.example.myapplication.DatabaseProviderWrap
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 class MainComponent(
     componentContext: ComponentContext,
@@ -19,14 +17,15 @@ class MainComponent(
     private val onEditNote: (id: Long) -> Unit,
 ) : ComponentContext by componentContext {
 
-
+    private var circleColorList:CircleColorList = CircleColorList()
     private val _showBottomSheet = mutableStateOf(false)
-    private var selectedItem: Long? = null
+    private var selectedItemId: Long? = null
+    private var _colorsList: MutableState<List<CircleColor>> = mutableStateOf(emptyList())
+    var colorsList: State<List<CircleColor>> = _colorsList
     val showBottomSheet: State<Boolean> = _showBottomSheet
-    lateinit var notes: Flow<List<Note>>
-    val job = CoroutineScope(Dispatchers.IO).launch {
-        notes = DatabaseProviderWrap.noteDao.getAll()
-    }
+    val notes = DatabaseProviderWrap.noteDao.getAll()
+
+
 
     fun onEvent(event: MainEvent) {
         when (event) {
@@ -43,27 +42,32 @@ class MainComponent(
             }
 
             is MainEvent.ShowBottomSheet -> {
-                selectedItem = event.id
+                selectedItemId = event.id
+                selectedItemId?.let{
+                    val tempNote = DatabaseProviderWrap.noteDao.getById(it)
+                    if (tempNote.color!=0){
+                        _colorsList.value = circleColorList.getSelected(tempNote.color)
+                    }
+                }
                 _showBottomSheet.value = true
             }
 
             MainEvent.DeleteNoteModal -> {
-                selectedItem?.let { id ->
+                selectedItemId?.let { id ->
                     DatabaseProviderWrap.noteDao.deleteById(id)
                 }
                 _showBottomSheet.value = false
             }
 
             MainEvent.DuplicateNoteModal -> {
-                selectedItem?.let { id ->
+                selectedItemId?.let { id ->
                     val tempNote = DatabaseProviderWrap.noteDao.getById(id)
                     DatabaseProviderWrap.noteDao.insert(tempNote.copy(id = 0))
                 }
-                _showBottomSheet.value = false
             }
 
             is MainEvent.ShareNoteModal -> {
-                selectedItem?.let { id ->
+                selectedItemId?.let { id ->
                     val tempNote = DatabaseProviderWrap.noteDao.getById(id)
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -78,16 +82,20 @@ class MainComponent(
             }
 
             MainEvent.HideBottomSheet -> {
-                selectedItem = null
+                selectedItemId = null
                 _showBottomSheet.value = false
             }
 
             MainEvent.EditNoteModal -> {
-                selectedItem?.let {
+                selectedItemId?.let {
                     onEditNote(it)
                 }
-                selectedItem = null
+                selectedItemId = null
                 _showBottomSheet.value = false
+            }
+
+            is MainEvent.SetNoteColorModal -> {
+                _colorsList.value = circleColorList.getSelected(event.color)
             }
         }
     }

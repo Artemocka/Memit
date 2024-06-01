@@ -1,4 +1,4 @@
-package com.dracul.notes.db
+package com.dracul.notes.data
 
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity

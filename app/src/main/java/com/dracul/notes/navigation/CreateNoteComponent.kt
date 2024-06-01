@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
-import com.dracul.notes.db.Note
+import com.dracul.notes.data.Note
 import com.dracul.notes.navigation.events.CreateNoteEvent
 import com.example.myapplication.DatabaseProviderWrap
 
@@ -20,7 +20,7 @@ class CreateNoteComponent(
     val content: State<String> = _content
 
     private val backCallback = BackCallback {
-        val note = Note(0, _title.value, _content.value, 0, false)
+        val note = Note(0, _title.value.trim(), _content.value.trim(), 0, false)
         note.isEmptyOrSave()
     }
 
@@ -40,7 +40,7 @@ class CreateNoteComponent(
             }
 
             is CreateNoteEvent.Back -> {
-                val note = Note(0, _title.value, _content.value, 0, false)
+                val note = Note(0, _title.value.trim(), _content.value.trim(), 0, false)
                 note.isEmptyOrSave()
             }
         }

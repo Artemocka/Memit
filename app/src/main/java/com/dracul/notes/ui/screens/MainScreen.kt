@@ -1,17 +1,25 @@
 package com.dracul.notes.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -19,6 +27,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,18 +35,29 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dracul.notes.R
-import com.dracul.notes.db.Note
+import com.dracul.notes.data.CircleColor
+import com.dracul.notes.data.Note
 import com.dracul.notes.navigation.MainComponent
 import com.dracul.notes.navigation.events.MainEvent
 import com.dracul.notes.navigation.events.MainEvent.CreateNote
@@ -50,44 +70,20 @@ import com.dracul.notes.navigation.events.MainEvent.ShareNoteModal
 import com.dracul.notes.navigation.events.MainEvent.ShowBottomSheet
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     component: MainComponent
 ) {
+
+    val clickLambda = remember<(id: Long) -> Unit> {
+        { component.onEvent(EditNote(it)) }
+    }
+    val longClickLambda = remember<(id: Long) -> Unit> {
+        { component.onEvent(ShowBottomSheet(it)) }
+    }
     val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList())
     val showBottomSheet = component.showBottomSheet
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "add")
-            }
-        },
-    ) { padding ->
-        LazyVerticalStaggeredGrid(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            columns = StaggeredGridCells.Adaptive(180.dp),
-            contentPadding = padding,
-        ) {
-
-
-
-            items(
-                count = notes.value.size,
-                key = {
-                    notes.value[it].id
-                }
-            ) { note ->
-                ItemGrid(
-                    item = notes.value[note],
-                    onItemClick = { id ->
-                        component.onEvent(EditNote(id))
-                    },
-
-                    onItemLongClick = {component.onEvent(ShowBottomSheet(it))},
-                )
-            }
-        }
-    }
     if (showBottomSheet.value) {
         BottomSheet(
             onDismiss = {
@@ -95,9 +91,47 @@ fun MainScreen(
             },
             onClick = {
                 component.onEvent(it)
-            }
+            },
+            onColorClick = {
+                component.onEvent(MainEvent.SetNoteColorModal(it))
+            },
+            colorList = component.colorsList
+
         )
     }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+            }
+        },
+        topBar = {
+            TopAppBar(title = { Text(text = "Notes") })
+        }
+    ) { padding ->
+
+        LazyVerticalStaggeredGrid(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            columns = StaggeredGridCells.Adaptive(180.dp),
+            contentPadding = padding,
+        ) {
+
+            items(
+                count = notes.value.size,
+                key = {
+                    notes.value[it].id
+                }
+            ) { index ->
+                ItemGrid(
+                    item = notes.value[index],
+                    onItemClick = clickLambda,
+                    onItemLongClick = longClickLambda,
+                )
+            }
+        }
+    }
+
+
 }
 
 
@@ -108,42 +142,101 @@ fun ItemGrid(
     onItemClick: (Long) -> Unit,
     onItemLongClick: (Long) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
+    val clickLambda = remember {
+        { onItemClick(item.id) }
+    }
+    val longClickLambda = remember {
+        {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            onItemLongClick(item.id)
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxSize()
             .padding(4.dp)
+            .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
-                onClick = {
-                    onItemClick(item.id)
-                },
-                onLongClick = {
-                    onItemLongClick(item.id)
-                }
+                onClick = clickLambda,
+                onLongClick = longClickLambda
             ),
+        colors = if (item.color != 0) CardDefaults.cardColors().copy(contentColor = Color(item.color)) else CardDefaults.cardColors(),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
-            Text(text = item.title)
-            Text(text = item.content)
+            Text(
+                text = item.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = item.content,
+                maxLines = 8,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 16.sp,
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheet(onDismiss: () -> Unit, onClick: (event: MainEvent) -> Unit) {
+fun BottomSheet(
+    onDismiss: () -> Unit,
+    onClick: (event: MainEvent) -> Unit,
+    onColorClick: (CircleColor) -> Unit,
+    colorList: State<List<CircleColor>>,
+) {
     val modalBottomSheetState = rememberModalBottomSheetState()
     val localContext = LocalContext.current
+    val editLambda = remember<() -> Unit> {
+        { onClick(EditNoteModal) }
+    }
+    val duplicateLambda = remember<() -> Unit> {
+        { onClick(DuplicateNoteModal) }
+    }
+    val shareLambda = remember<() -> Unit> {
+        { onClick(ShareNoteModal(localContext)) }
+    }
+    val deleteLambda = remember<() -> Unit> {
+        { onClick(DeleteNoteModal) }
+    }
+
+
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
+        windowInsets = WindowInsets(bottom = 0)
     ) {
-        BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = { onClick(EditNoteModal) })
-        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy), text = "Duplicate", onClick = { onClick(DuplicateNoteModal) })
-        BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = { onClick(ShareNoteModal(localContext)) })
-        BottomSheetRow(image = Icons.Filled.Delete, text = "Delete", onClick = { onClick(DeleteNoteModal) })
+        val scrollState = rememberScrollState()
+
+
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
+        ) {
+            items(
+                count = colorList.value.size,
+                key = {
+                    colorList.value[it].color
+                }
+            ) { index ->
+                CircleColorItem(item = colorList.value[index], onClick = onColorClick)
+            }
+        }
+        BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = editLambda)
+        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy), text = "Duplicate", onClick = duplicateLambda)
+        BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = shareLambda)
+        BottomSheetRow(image = Icons.Filled.Delete, text = "Delete", onClick = deleteLambda)
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -152,16 +245,29 @@ fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .clickable { onClick() }) {
-        Row(modifier = Modifier.padding(vertical = 12.dp)) {
+        Row(modifier = Modifier.padding(vertical = 16.dp)) {
             Image(
                 image, contentDescription = text,
                 Modifier.padding(start = 16.dp, end = 16.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
-            Text(text = text)
+            Text(
+                text = text,
+                color = if (text == "Delete") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
+
+@Composable
+fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
+    Image(
+        painter = painterResource(id = if (item.selected) R.drawable.ic_selected_circle else R.drawable.ic_circle),
+        contentDescription = "Color circle",
+        modifier = Modifier.clickable { onClick(item) }
+    )
+}
+
 
 @Composable
 fun BottomSheetRow(image: ImageVector, text: String, onClick: () -> Unit) {

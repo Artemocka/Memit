@@ -5,11 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.EaseInBounce
+import androidx.compose.animation.core.EaseInCubic
+import androidx.compose.animation.core.EaseInExpo
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseInOutElastic
+import androidx.compose.animation.core.EaseInOutExpo
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
@@ -46,7 +56,7 @@ fun App(root: RootComponent) {
         val childStack by root.childStack.subscribeAsState()
         Children(
             stack = childStack,
-            animation = stackAnimation(slide())
+            animation = stackAnimation(slide(tween(250, easing = EaseInOut) ))
         ) { child ->
             when (val instance = child.instance) {
                 is RootComponent.Child.CreateNote -> CreateNoteScreen(instance.component)
