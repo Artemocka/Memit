@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.dracul.baselineprofile-mergeNonMinifiedReleaseResources-15:/values-hy/values-hy.xml",
+            "map": [
+                {
+                    "source": "/home/lumina/.gradle/caches/transforms-4/f49e319140ea2125a63fcbb96308d8e1/transformed/core-1.9.0/res/values-hy/values-hy.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        }
+    ]
+}

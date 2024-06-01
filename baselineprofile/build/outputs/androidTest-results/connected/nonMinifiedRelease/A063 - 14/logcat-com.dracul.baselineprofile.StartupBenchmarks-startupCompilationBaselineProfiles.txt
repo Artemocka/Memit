@@ -1,0 +1,43 @@
+05-30 01:43:41.574 31699 31836 I TestRunner: started: startupCompilationBaselineProfiles(com.dracul.baselineprofile.StartupBenchmarks)
+05-30 01:43:41.574 30651 26446 I NetworkScheduler.Stats: (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+05-30 01:43:41.579 30651 31402 I NetworkScheduler.Stats: (REDACTED) Task %s/%s finished executing. cause:%s result: %s elapsed_millis: %s uptime_millis: %s exec_start_elapsed_seconds: %s
+05-30 01:43:41.585 31699 31836 I GrantPermissionCallable: Permission: android.permission.WRITE_EXTERNAL_STORAGE is already granted!
+05-30 01:43:41.586 31699 31836 I GrantPermissionCallable: Permission: android.permission.READ_EXTERNAL_STORAGE is already granted!
+05-30 01:43:41.586 31699 31836 E TestRunner: assumption failed: startupCompilationBaselineProfiles(com.dracul.baselineprofile.StartupBenchmarks)
+05-30 01:43:41.586 31699 31836 E TestRunner: ----- begin exception -----
+05-30 01:43:41.591 31699 31836 E TestRunner: org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.Assume.assumeThat(Assume.java:106)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.Assume.assumeTrue(Assume.java:50)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.benchmark.macro.junit4.MacrobenchmarkRule$applyInternal$1.evaluate(MacrobenchmarkRule.kt:131)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.test.rule.GrantPermissionRule$RequestPermissionStatement.evaluate(GrantPermissionRule.java:136)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.rules.RunRules.evaluate(RunRules.java:20)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:128)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:27)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:67)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:58)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:446)
+05-30 01:43:41.591 31699 31836 E TestRunner: 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2542)
+05-30 01:43:41.591 31699 31836 E TestRunner: ----- end exception -----
+05-30 01:43:41.593 31699 31836 I TestRunner: finished: startupCompilationBaselineProfiles(com.dracul.baselineprofile.StartupBenchmarks)

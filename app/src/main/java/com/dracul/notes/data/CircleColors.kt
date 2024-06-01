@@ -34,4 +34,10 @@ class CircleColorList() {
             else it
         }.toList()
     }
+    fun getSelected(noteColor: Int): List<CircleColor> {
+        return list.map {
+            if (it.color == noteColor) it.copy(selected = true)
+            else it
+        }.toList()
+    }
 }

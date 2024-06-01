@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -49,6 +50,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,7 +84,7 @@ fun MainScreen(
     val longClickLambda = remember<(id: Long) -> Unit> {
         { component.onEvent(ShowBottomSheet(it)) }
     }
-    val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList())
+    val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList(), lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current )
     val showBottomSheet = component.showBottomSheet
     if (showBottomSheet.value) {
         BottomSheet(
@@ -130,10 +132,7 @@ fun MainScreen(
             }
         }
     }
-
-
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -162,7 +161,7 @@ fun ItemGrid(
                 onClick = clickLambda,
                 onLongClick = longClickLambda
             ),
-        colors = if (item.color != 0) CardDefaults.cardColors().copy(contentColor = Color(item.color)) else CardDefaults.cardColors(),
+        colors = if (item.color != 0) CardDefaults.cardColors().copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
 
@@ -171,9 +170,10 @@ fun ItemGrid(
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
+                modifier = Modifier.padding(bottom = 4.dp),
                 text = item.title,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = item.content,
@@ -213,23 +213,19 @@ fun BottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        windowInsets = WindowInsets(bottom = 0)
-    ) {
+        windowInsets = WindowInsets(bottom = 0),
+
+        ) {
         val scrollState = rememberScrollState()
 
 
-        LazyRow(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(scrollState)
         ) {
-            items(
-                count = colorList.value.size,
-                key = {
-                    colorList.value[it].color
-                }
-            ) { index ->
-                CircleColorItem(item = colorList.value[index], onClick = onColorClick)
+            repeat(colorList.value.size){
+                CircleColorItem(item = colorList.value[it], onClick = onColorClick)
             }
         }
         BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = editLambda)
@@ -261,12 +257,18 @@ fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
 
 @Composable
 fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
+    val color = getColor(id = item.color)
     Image(
         painter = painterResource(id = if (item.selected) R.drawable.ic_selected_circle else R.drawable.ic_circle),
+        colorFilter = ColorFilter.tint(color),
         contentDescription = "Color circle",
-        modifier = Modifier.clickable { onClick(item) }
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .clip(CircleShape)
+            .clickable { onClick(item) }
     )
 }
+
 
 
 @Composable
@@ -285,5 +287,24 @@ fun BottomSheetRow(image: ImageVector, text: String, onClick: () -> Unit) {
                 color = if (text == "Delete") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
             )
         }
+    }
+}
+
+@Composable
+fun getColor(id: Int): Color {
+    return when (id) {
+        1 -> colorResource(R.color.color1)
+        2 -> colorResource(R.color.color2)
+        3 -> colorResource(R.color.color3)
+        4 -> colorResource(R.color.color4)
+        5 -> colorResource(R.color.color5)
+        6 -> colorResource(R.color.color6)
+        7 -> colorResource(R.color.color7)
+        8 -> colorResource(R.color.color8)
+        9 -> colorResource(R.color.color9)
+        10 -> colorResource(R.color.color10)
+        11 -> colorResource(R.color.color11)
+        12 -> colorResource(R.color.color12)
+        else -> Color(0)
     }
 }
