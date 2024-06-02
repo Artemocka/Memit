@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc05")
     implementation(libs.decompose.jetbrains)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.decompose)
