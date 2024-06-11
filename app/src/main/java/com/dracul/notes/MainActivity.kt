@@ -8,8 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
@@ -49,7 +53,7 @@ fun App(root: RootComponent) {
         val childStack by root.childStack.subscribeAsState()
         Children(
             stack = childStack,
-            animation = stackAnimation(slide(tween(250, easing = EaseInOut) ))
+            animation = stackAnimation(slide(tween(250, easing = EaseInOut) )),
         ) { child ->
             when (val instance = child.instance) {
                 is RootComponent.Child.CreateNote -> CreateNoteScreen(instance.component)

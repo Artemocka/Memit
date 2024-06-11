@@ -1,11 +1,22 @@
 package com.dracul.notes.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,9 +53,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -69,6 +82,7 @@ import com.dracul.notes.navigation.events.MainEvent.EditNoteModal
 import com.dracul.notes.navigation.events.MainEvent.HideBottomSheet
 import com.dracul.notes.navigation.events.MainEvent.ShareNoteModal
 import com.dracul.notes.navigation.events.MainEvent.ShowBottomSheet
+import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.launch
 
 
@@ -84,31 +98,27 @@ fun MainScreen(
     val longClickLambda = remember<(id: Long) -> Unit> {
         { component.onEvent(ShowBottomSheet(it)) }
     }
-    val notes = component.notes.collectAsStateWithLifecycle(initialValue = emptyList(), lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current)
+    val notes = component.notes.collectAsStateWithLifecycle(
+        initialValue = emptyList(),
+        lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    )
     val showBottomSheet = component.showBottomSheet
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "add")
-            }
-        },
-        topBar = {
-            TopAppBar(title = { Text(text = "Notes") })
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "add")
         }
-    ) { padding ->
+    }, topBar = {
+        TopAppBar(title = { Text(text = "Notes") })
+    }) { padding ->
         if (showBottomSheet.value) {
-            BottomSheet(
-                onDismiss = {
-                    component.onEvent(HideBottomSheet)
-                },
-                onEvent = {
-                    component.onEvent(it)
-                },
-                onColorClick = {
-                    component.onEvent(MainEvent.SetNoteColorModal(it))
-                },
-                colorList = component.colorsList
+            BottomSheet(onDismiss = {
+                component.onEvent(HideBottomSheet)
+            }, onEvent = {
+                component.onEvent(it)
+            }, onColorClick = {
+                component.onEvent(MainEvent.SetNoteColorModal(it))
+            }, colorList = component.colorsList
 
             )
         }
@@ -118,12 +128,9 @@ fun MainScreen(
             contentPadding = padding,
         ) {
 
-            items(
-                count = notes.value.size,
-                key = {
-                    notes.value[it].id
-                }
-            ) { index ->
+            items(count = notes.value.size, key = {
+                notes.value[it].id
+            }) { index ->
                 ItemGrid(
                     item = notes.value[index],
                     onItemClick = clickLambda,
@@ -158,10 +165,10 @@ fun ItemGrid(
             .padding(4.dp)
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
-                onClick = clickLambda,
-                onLongClick = longClickLambda
+                onClick = clickLambda, onLongClick = longClickLambda
             ),
-        colors = if (item.color != 0) CardDefaults.cardColors().copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(),
+        colors = if (item.color != 0) CardDefaults.cardColors()
+            .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
 
@@ -169,14 +176,16 @@ fun ItemGrid(
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
+            if (item.title.isNotEmpty()) {
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = item.title,
+                    fontSize = 18.sp,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Text(
-                modifier = Modifier.padding(bottom = 4.dp),
-                text = item.title,
-                fontSize = 18.sp,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = item.content,
+                text = RichTextState().setHtml(item.content).annotatedString,
                 maxLines = 8,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 16.sp,
@@ -238,15 +247,18 @@ fun BottomSheet(
 
             }
         })
-        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy), text = "Duplicate", onClick = {
-            duplicateLambda()
-            scope.launch {
-                modalBottomSheetState.hide()
-            }.invokeOnCompletion {
-                onEvent(HideBottomSheet)
+        BottomSheetRow(
+            image = painterResource(id = R.drawable.ic_copy),
+            text = "Duplicate",
+            onClick = {
+                duplicateLambda()
+                scope.launch {
+                    modalBottomSheetState.hide()
+                }.invokeOnCompletion {
+                    onEvent(HideBottomSheet)
 
-            }
-        })
+                }
+            })
         BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = {
             shareLambda()
             scope.launch {
@@ -276,7 +288,8 @@ fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
         .clickable { onClick() }) {
         Row(modifier = Modifier.padding(vertical = 16.dp)) {
             Image(
-                image, contentDescription = text,
+                image,
+                contentDescription = text,
                 Modifier.padding(start = 16.dp, end = 16.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
@@ -291,15 +304,38 @@ fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
 @Composable
 fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
     val color = getColor(id = item.color)
-    Image(
-        painter = painterResource(id = if (item.selected) R.drawable.ic_selected_circle else R.drawable.ic_circle),
-        colorFilter = ColorFilter.tint(color),
-        contentDescription = "Color circle",
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .clip(CircleShape)
-            .clickable { onClick(item) }
-    )
+    AnimatedContent(targetState = item.selected,
+        transitionSpec = {
+            scaleIn(
+                tween(200, easing = EaseIn),
+                initialScale = 0.95f
+            ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
+                tween(200, easing = EaseOut),
+                targetScale = 0.85f
+            ) + fadeOut(targetAlpha = 0.9f)
+        }) {
+        if (it) {
+            Image(painter = painterResource(id = R.drawable.ic_selected_circle),
+                colorFilter = ColorFilter.tint(color),
+                contentDescription = "Color circle",
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clip(CircleShape)
+                    .noRippleClickable { onClick(item) }
+
+
+            )
+        } else {
+            Image(painter = painterResource(id = R.drawable.ic_circle),
+                colorFilter = ColorFilter.tint(color),
+                contentDescription = "Color circle",
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clip(CircleShape)
+                    .clickable { onClick(item) })
+        }
+
+    }
 }
 
 
@@ -310,9 +346,12 @@ fun BottomSheetRow(image: ImageVector, text: String, onClick: () -> Unit) {
         .clickable { onClick() }) {
         Row(modifier = Modifier.padding(vertical = 16.dp)) {
             Image(
-                image, contentDescription = text,
+                image,
+                contentDescription = text,
                 Modifier.padding(start = 16.dp, end = 16.dp),
-                colorFilter = if (text == "Delete") ColorFilter.tint(MaterialTheme.colorScheme.error) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                colorFilter = if (text == "Delete") ColorFilter.tint(MaterialTheme.colorScheme.error) else ColorFilter.tint(
+                    MaterialTheme.colorScheme.primary
+                )
             )
             Text(
                 text = text,
@@ -321,6 +360,7 @@ fun BottomSheetRow(image: ImageVector, text: String, onClick: () -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun getColor(id: Int): Color {
@@ -338,5 +378,18 @@ fun getColor(id: Int): Color {
         11 -> colorResource(R.color.color11)
         12 -> colorResource(R.color.color12)
         else -> Color(0)
+    }
+}
+
+@Composable
+fun getBlendedColor(id: Int): Color {
+    val color = getColor(id = id)
+    val white = colorResource(id = R.color.white)
+    return lerp(color, white, 0.4f)
+}
+
+fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
+    this.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
     }
 }
