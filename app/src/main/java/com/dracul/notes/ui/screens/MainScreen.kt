@@ -13,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -104,7 +105,8 @@ fun MainScreen(
     )
     val showBottomSheet = component.showBottomSheet
 
-    Scaffold(floatingActionButton = {
+    Scaffold(
+        floatingActionButton = {
         FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "add")
         }
@@ -168,7 +170,7 @@ fun ItemGrid(
                 onClick = clickLambda, onLongClick = longClickLambda
             ),
         colors = if (item.color != 0) CardDefaults.cardColors()
-            .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(),
+            .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
 
@@ -377,7 +379,7 @@ fun getColor(id: Int): Color {
         10 -> colorResource(R.color.color10)
         11 -> colorResource(R.color.color11)
         12 -> colorResource(R.color.color12)
-        else -> Color(0)
+        else -> MaterialTheme.colorScheme.background
     }
 }
 
@@ -385,7 +387,7 @@ fun getColor(id: Int): Color {
 fun getBlendedColor(id: Int): Color {
     val color = getColor(id = id)
     val white = colorResource(id = R.color.white)
-    return lerp(color, white, 0.4f)
+    return lerp(color, white, 0.35f)
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {

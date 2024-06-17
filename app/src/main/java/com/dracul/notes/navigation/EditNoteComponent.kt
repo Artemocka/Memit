@@ -13,7 +13,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.notes.data.Note
 import com.dracul.notes.navigation.events.EditNoteEvent
-import com.dracul.pokeapp.utills.poop
 import com.example.myapplication.DatabaseProviderWrap
 import com.mohamedrejeb.richeditor.model.RichTextState
 
@@ -28,9 +27,6 @@ class EditNoteComponent(
     var content = RichTextState().setHtml(note.content)
     val title: State<String> = _title
     val color: State<Int> = mutableIntStateOf(note.color)
-    val _formatMode = mutableStateOf(false)
-    val formatMode: State<Boolean> = _formatMode
-
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
         note = note.copy(title = _title.value.trim(), content = content.toHtml())
         note.isEmptyOrUpdate()
@@ -59,7 +55,6 @@ class EditNoteComponent(
             EditNoteEvent.SetAlignCenter -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Center))
             EditNoteEvent.SetAlignEnd -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
             EditNoteEvent.SetAlignStart -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Start))
-            EditNoteEvent.SetFormatMode -> _formatMode.value = !_formatMode.value
             EditNoteEvent.ClearALl -> {
                content.removeSpanStyle(spanStyle = content.currentSpanStyle)
                 content.removeParagraphStyle(paragraphStyle = content.currentParagraphStyle)

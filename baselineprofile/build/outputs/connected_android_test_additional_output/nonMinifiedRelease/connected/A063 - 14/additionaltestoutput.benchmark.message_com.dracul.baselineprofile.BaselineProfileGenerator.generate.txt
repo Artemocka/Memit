@@ -1,6 +1,0 @@
-BaselineProfileGenerator_generate
-Total run time Ns: 53042449094.
-Baseline profile [results](file://BaselineProfileGenerator_generate-startup-prof-2024-05-29-22-43-41.txt)
-
-To copy the profile use:
-adb -s P21271005039 pull "/sdcard/Android/media/com.dracul.baselineprofile/additional_test_output/BaselineProfileGenerator_generate-startup-prof.txt" .

@@ -74,12 +74,20 @@ class MainComponent(
                         action = Intent.ACTION_SEND
                         putExtra(
                             Intent.EXTRA_TEXT,
-                            if (tempNote.title.isNotEmpty()) "${tempNote.title}\n${tempNote.content}"
-                            else "${RichTextState().setMarkdown(tempNote.content).annotatedString}"
+                            if (tempNote.title.isNotEmpty()) "${tempNote.title}\n${
+                                RichTextState().setHtml(
+                                    tempNote.content
+                                ).annotatedString
+                            }"
+                            else RichTextState().setHtml(tempNote.content).annotatedString
                         )
                         type = "text/plain"
                     }
-                    startActivity(event.context, Intent.createChooser(sendIntent, tempNote.title), null)
+                    startActivity(
+                        event.context,
+                        Intent.createChooser(sendIntent, tempNote.title),
+                        null
+                    )
                 }
             }
 
@@ -98,7 +106,8 @@ class MainComponent(
             is MainEvent.SetNoteColorModal -> {
                 _colorsList.value = circleColorList.getSelected(event.color)
                 selectedItemId?.let {
-                    val tempNote = DatabaseProviderWrap.noteDao.getById(it).copy(color = event.color.color)
+                    val tempNote =
+                        DatabaseProviderWrap.noteDao.getById(it).copy(color = event.color.color)
                     DatabaseProviderWrap.noteDao.update(tempNote)
                 }
             }
