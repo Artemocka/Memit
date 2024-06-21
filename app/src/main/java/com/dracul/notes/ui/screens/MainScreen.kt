@@ -18,6 +18,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,10 +31,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
@@ -48,17 +52,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -67,6 +77,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -89,13 +101,12 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     component: MainComponent
 ) {
     val haptic = LocalHapticFeedback.current
-
     val clickLambda = remember<(id: Long) -> Unit> {
         { component.onEvent(EditNote(it)) }
     }
@@ -105,21 +116,32 @@ fun MainScreen(
     val longClickLambda = remember<(id: Long) -> Unit> {
         {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            component.onEvent(ShowBottomSheet(it)) }
+            component.onEvent(ShowBottomSheet(it))
+        }
     }
     val notes = component.notes.collectAsStateWithLifecycle(
         initialValue = emptyList(),
         lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
     )
     val showBottomSheet = component.showBottomSheet
-
+    val text = component.searchQuery.collectAsStateWithLifecycle(
+        initialValue = "",
+        lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    )
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "add")
             }
         }, topBar = {
-            TopAppBar(title = { Text(text = "Notes") })
+            TopAppBarWithSearch(
+                showSearchBox = component.showSearchBar.value,
+                text = text.value,
+                onEdit = {
+                    component.onEvent(MainEvent.SetSearchQuery(it))
+                }) {
+                component.onEvent(MainEvent.ShowSearchBar)
+            }
         }) { padding ->
         if (showBottomSheet.value) {
             BottomSheet(onDismiss = {
@@ -129,7 +151,6 @@ fun MainScreen(
             }, onColorClick = {
                 component.onEvent(MainEvent.SetNoteColorModal(it))
             }, colorList = component.colorsList
-
             )
         }
         LazyVerticalStaggeredGrid(
@@ -162,8 +183,6 @@ fun ItemGrid(
     onItemLongClick: (Long) -> Unit,
     onStarClick: (Long, Boolean) -> Unit,
 ) {
-
-
     Card(
         modifier = modifier
             .fillMaxSize()
@@ -212,6 +231,7 @@ fun ItemGrid(
                 )
             }
         }
+
     }
 }
 
@@ -220,6 +240,84 @@ fun ItemGrid(
 fun ItemGrinPreview() {
     val note = Note(0, "Заметка", "Контент", color = 1, pinned = true)
     ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { a, b -> })
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarWithSearch(
+    showSearchBox: Boolean,
+    text: String,
+    onEdit: (String) -> Unit,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusRequester = remember { FocusRequester() }
+    val colors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Unspecified,
+        unfocusedContainerColor = Color.Unspecified,
+        disabledContainerColor = Color.Unspecified,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+    )
+    TopAppBar(
+        title = {
+            if (showSearchBox) {
+                Row(
+                    modifier = Modifier.padding(end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SideEffect {
+                        focusRequester.requestFocus()
+                    }
+                    BasicTextField(
+                        value = text,
+                        onValueChange = onEdit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .focusRequester(focusRequester),
+                        textStyle = TextStyle(
+                            fontSize = 18.sp,
+                            lineHeight = 48.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        singleLine = true,
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                        decorationBox = {
+                            TextFieldDefaults.DecorationBox(
+                                value = text,
+                                innerTextField = it,
+                                enabled = true,
+                                singleLine = true,
+                                visualTransformation = VisualTransformation.None,
+                                isError = false,
+                                colors = colors,
+                                placeholder = { Text(text = "Search ") },
+                                contentPadding = PaddingValues(10.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                interactionSource = interactionSource,
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable {
+                                            onClick()
+                                        })
+                                },
+                            )
+                        }
+                    )
+
+
+                }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "Note", modifier = Modifier.weight(1f))
+                    IconButton(onClick = onClick) {
+                        Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                    }
+                }
+            }
+
+        })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -375,8 +473,6 @@ fun CircleColorItem(
                     .padding(horizontal = 4.dp)
                     .clip(CircleShape)
                     .noRippleClickable { onClick(item) }
-
-
             )
         } else {
             Image(painter = painterResource(id = R.drawable.ic_circle),
@@ -387,7 +483,6 @@ fun CircleColorItem(
                     .clip(CircleShape)
                     .clickable { onClick(item) })
         }
-
     }
 }
 
@@ -446,3 +541,4 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
         onClick()
     }
 }
+

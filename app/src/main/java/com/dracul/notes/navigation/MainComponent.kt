@@ -1,7 +1,6 @@
 package com.dracul.notes.navigation
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -12,8 +11,9 @@ import com.dracul.notes.data.CircleColorList
 import com.dracul.notes.navigation.events.MainEvent
 import com.example.myapplication.DatabaseProviderWrap
 import com.mohamedrejeb.richeditor.model.RichTextState
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 
 class MainComponent(
     componentContext: ComponentContext,
@@ -24,22 +24,45 @@ class MainComponent(
     private val _showBottomSheet = mutableStateOf(false)
     private var selectedItemId: Long? = null
     private var _colorsList: MutableState<List<CircleColor>> = mutableStateOf(emptyList())
+    private var _showSearchBar = mutableStateOf(false)
+    private var _searchQuery = MutableStateFlow("")
+    var searchQuery = _searchQuery.asStateFlow()
+    var showSearchBar: State<Boolean> = _showSearchBar
     var colorsList: State<List<CircleColor>> = _colorsList
     val showBottomSheet: State<Boolean> = _showBottomSheet
-    val notes = DatabaseProviderWrap.noteDao.getAll().map { list ->
-        list.sortedBy { !it.pinned  }
+    val notes = combine(_searchQuery, DatabaseProviderWrap.noteDao.getAll()) { query, list ->
+        if (query.isNotEmpty()) {
+            list.filter {
+                it.title.contains(
+                    query,
+                    ignoreCase = true
+                ) || RichTextState().setHtml(it.content).annotatedString.text.contains(
+                    query,
+                    ignoreCase = true
+                )
+            }.sortedBy { !it.pinned }
+        } else {
+            list.sortedBy { !it.pinned }
+        }
     }
-
 
 
     fun onEvent(event: MainEvent) {
         when (event) {
             MainEvent.CreateNote -> {
                 onEditNote(null)
+                if (_showSearchBar.value) {
+                    _searchQuery.value = ""
+                    _showSearchBar.value = !_showSearchBar.value
+                }
             }
 
             is MainEvent.EditNote -> {
                 onEditNote(event.id)
+                if (_showSearchBar.value) {
+                    _searchQuery.value = ""
+                    _showSearchBar.value = !_showSearchBar.value
+                }
             }
 
             is MainEvent.DeleteNote -> {
@@ -117,8 +140,15 @@ class MainComponent(
                 }
             }
 
-            is MainEvent.SetStarred ->{
+            is MainEvent.SetStarred -> {
                 DatabaseProviderWrap.noteDao.updatePinnedById(event.id, !event.pinned)
+            }
+
+            is MainEvent.SetSearchQuery -> _searchQuery.value = event.query
+            MainEvent.ShowSearchBar -> {
+                _showSearchBar.value = !_showSearchBar.value
+                if (!_showSearchBar.value)
+                    _searchQuery.value = ""
             }
         }
     }
