@@ -133,7 +133,7 @@ fun MainScreen(
             )
         }
         LazyVerticalStaggeredGrid(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 8.dp),
             columns = StaggeredGridCells.Adaptive(180.dp),
             contentPadding = padding,
         ) {
