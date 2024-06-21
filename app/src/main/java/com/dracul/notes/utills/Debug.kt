@@ -1,4 +1,4 @@
-package com.dracul.pokeapp.utills
+package com.dracul.notes.utills
 
 import android.util.Log
 

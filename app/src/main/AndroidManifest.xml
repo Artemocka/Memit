@@ -23,6 +23,7 @@
             android:theme="@style/Theme.Notes"
             android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation"
+            android:enableOnBackInvokedCallback="true"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

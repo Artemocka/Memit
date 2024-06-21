@@ -5,11 +5,12 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import kotlinx.serialization.Serializable
 
 class RootComponent(
     componentContext: ComponentContext,
-) : ComponentContext by componentContext {
+) : ComponentContext by componentContext, BackHandlerOwner {
 
     private val navigation = StackNavigation<Configuration>()
 
@@ -18,26 +19,17 @@ class RootComponent(
         serializer = Configuration.serializer(),
         initialConfiguration = Configuration.MainScreen,
         handleBackButton = true,
-        childFactory = ::createChild
+        childFactory = ::сhild
     )
 
-    private fun createChild(
+
+    private fun сhild(
         config: Configuration, context: ComponentContext
     ): Child {
         return when (config) {
-            Configuration.CreateNote -> Child.CreateNote(
-                CreateNoteComponent(
-                    componentContext = context,
-                    onGoBack = {
-                        navigation.pop()
-                    }
-                )
-            )
-
             is Configuration.MainScreen -> Child.MainScreen(
                 MainComponent(
                     componentContext = context,
-                    onCreateNote = { navigation.pushNew(Configuration.CreateNote) },
                     onEditNote = { navigation.pushNew(Configuration.EditNote(it)) }
                 )
             )
@@ -52,20 +44,21 @@ class RootComponent(
         }
     }
 
+    fun onBackClick() {
+        navigation.pop()
+    }
+
 
     sealed class Child {
-        data class CreateNote(val component: CreateNoteComponent) : Child()
         data class MainScreen(val component: MainComponent) : Child()
         data class EditNote(val component: EditNoteComponent) : Child()
     }
 
     @Serializable
     sealed class Configuration {
-        @Serializable
-        data object CreateNote : Configuration()
 
         @Serializable
-        data class EditNote(val id: Long) : Configuration()
+        data class EditNote(val id: Long?) : Configuration()
 
         @Serializable
         data object MainScreen : Configuration()

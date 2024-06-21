@@ -1,5 +1,6 @@
 package com.dracul.notes.navigation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.notes.data.Note
@@ -17,23 +20,36 @@ import com.example.myapplication.DatabaseProviderWrap
 import com.mohamedrejeb.richeditor.model.RichTextState
 
 class EditNoteComponent(
-    id: Long,
+    id: Long?,
     componentContext: ComponentContext,
     private val onGoBack: () -> Unit,
 ) : ComponentContext by componentContext {
 
-    private var note = DatabaseProviderWrap.noteDao.getById(id)
+    private var note: Note = id.let {
+        if (it == null) {
+            return@let Note(0, "", "", 0)
+        } else {
+            return@let DatabaseProviderWrap.noteDao.getById(it)
+        }
+    }
+
+
     private var _title = mutableStateOf(note.title)
     var content = RichTextState().setHtml(note.content)
     val title: State<String> = _title
     val color: State<Int> = mutableIntStateOf(note.color)
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
         note = note.copy(title = _title.value.trim(), content = content.toHtml())
-        note.isEmptyOrUpdate()
+        Log.e(null, note.toString())
+        if (note.id.toInt() == 0)
+            note.isEmptyOrInsert()
+        else
+            note.isEmptyOrUpdate()
     }
 
     init {
         backHandler.register(backCallback)
+
     }
 
     fun onEvent(event: EditNoteEvent) {
@@ -44,29 +60,49 @@ class EditNoteComponent(
 
             is EditNoteEvent.Back -> {
                 note = note.copy(title = _title.value.trim(), content = content.toHtml())
-                note.isEmptyOrUpdate()
+                if (note.id.toInt() == 0)
+                    note.isEmptyOrInsert()
+                else
+                    note.isEmptyOrUpdate()
             }
 
             EditNoteEvent.SetBold -> content.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
             EditNoteEvent.SetItalic -> content.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-            EditNoteEvent.SetStrokethrough -> {
-                content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-            }
+            EditNoteEvent.SetLinethrough -> content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
             EditNoteEvent.SetAlignCenter -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Center))
             EditNoteEvent.SetAlignEnd -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
             EditNoteEvent.SetAlignStart -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Start))
             EditNoteEvent.ClearALl -> {
-               content.removeSpanStyle(spanStyle = content.currentSpanStyle)
+                content.currentSpanStyle.textDecoration?.let {
+                    if (it.contains(TextDecoration.Underline))
+                        content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                    if (it.contains(TextDecoration.LineThrough))
+                        content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+                }
+                content.toggleSpanStyle(content.currentSpanStyle)
                 content.removeParagraphStyle(paragraphStyle = content.currentParagraphStyle)
+            }
+
+            EditNoteEvent.SetUnderline -> {
+                content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
             }
         }
     }
 
     private fun Note.isEmptyOrUpdate() {
-        if (this.title.isEmpty() && this.content.isEmpty()) {
+        if (this.title.isEmpty() && this.content == "<br>") {
             onGoBack()
         } else {
             DatabaseProviderWrap.noteDao.update(this)
+            onGoBack()
+        }
+    }
+
+    private fun Note.isEmptyOrInsert() {
+        if (this.title.isEmpty() && this.content == "<br>") {
+            onGoBack()
+        } else {
+            DatabaseProviderWrap.noteDao.insert(this)
             onGoBack()
         }
     }

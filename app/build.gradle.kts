@@ -27,7 +27,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
 //            isDebuggable = false
@@ -45,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -55,16 +54,17 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc05")
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.material)
+    implementation(libs.richeditor.compose)
     implementation(libs.decompose.jetbrains)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.decompose)
-    implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

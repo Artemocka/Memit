@@ -14,8 +14,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 
 class MainComponent(
     componentContext: ComponentContext,
-    private val onCreateNote: () -> Unit,
-    private val onEditNote: (id: Long) -> Unit,
+    private val onEditNote: (id: Long?) -> Unit,
 ) : ComponentContext by componentContext {
 
     private var circleColorList: CircleColorList = CircleColorList()
@@ -30,7 +29,7 @@ class MainComponent(
     fun onEvent(event: MainEvent) {
         when (event) {
             MainEvent.CreateNote -> {
-                onCreateNote()
+                onEditNote(null)
             }
 
             is MainEvent.EditNote -> {

@@ -1,7 +1,6 @@
 package com.dracul.notes.ui.screens
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
@@ -13,7 +12,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -56,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
@@ -107,12 +106,12 @@ fun MainScreen(
 
     Scaffold(
         floatingActionButton = {
-        FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "add")
-        }
-    }, topBar = {
-        TopAppBar(title = { Text(text = "Notes") })
-    }) { padding ->
+            FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+            }
+        }, topBar = {
+            TopAppBar(title = { Text(text = "Notes") })
+        }) { padding ->
         if (showBottomSheet.value) {
             BottomSheet(onDismiss = {
                 component.onEvent(HideBottomSheet)
@@ -172,7 +171,9 @@ fun ItemGrid(
         colors = if (item.color != 0) CardDefaults.cardColors()
             .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+        border = BorderStroke(
+            if (item.color == 0) 0.5.dp else 0.dp,if (item.color == 0) MaterialTheme.colorScheme.outline else Color.Transparent
+        )
 
     ) {
         Column(
@@ -234,10 +235,31 @@ fun BottomSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(scrollState)
-        ) {
+                .horizontalScroll(scrollState),
+
+            ) {
             repeat(colorList.value.size) {
-                CircleColorItem(item = colorList.value[it], onClick = onColorClick)
+                when (it) {
+                    0 -> {
+                        CircleColorItem(
+                            modifier = Modifier.padding(start = 8.dp),
+                            item = colorList.value[it],
+                            onClick = onColorClick
+                        )
+                    }
+
+                    colorList.value.lastIndex -> {
+                        CircleColorItem(
+                            modifier = Modifier.padding(end = 8.dp),
+                            item = colorList.value[it],
+                            onClick = onColorClick
+                        )
+                    }
+
+                    else -> {
+                        CircleColorItem(item = colorList.value[it], onClick = onColorClick)
+                    }
+                }
             }
         }
         BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = {
@@ -304,7 +326,11 @@ fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
+fun CircleColorItem(
+    modifier: Modifier = Modifier,
+    item: CircleColor,
+    onClick: (CircleColor) -> Unit
+) {
     val color = getColor(id = item.color)
     AnimatedContent(targetState = item.selected,
         transitionSpec = {
@@ -320,7 +346,7 @@ fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
             Image(painter = painterResource(id = R.drawable.ic_selected_circle),
                 colorFilter = ColorFilter.tint(color),
                 contentDescription = "Color circle",
-                modifier = Modifier
+                modifier = modifier
                     .padding(horizontal = 4.dp)
                     .clip(CircleShape)
                     .noRippleClickable { onClick(item) }
@@ -331,7 +357,7 @@ fun CircleColorItem(item: CircleColor, onClick: (CircleColor) -> Unit) {
             Image(painter = painterResource(id = R.drawable.ic_circle),
                 colorFilter = ColorFilter.tint(color),
                 contentDescription = "Color circle",
-                modifier = Modifier
+                modifier = modifier
                     .padding(horizontal = 4.dp)
                     .clip(CircleShape)
                     .clickable { onClick(item) })
