@@ -30,6 +30,9 @@ interface NoteDao {
     @Update
     fun update(item: Note)
 
+    @Query("UPDATE Note SET pinned = :pinned  WHERE id = :id")
+    fun updatePinnedById(id: Long, pinned:Boolean)
+
     @Delete
     fun delete(item: Note)
     @Query("DELETE FROM Note where id=  :id")

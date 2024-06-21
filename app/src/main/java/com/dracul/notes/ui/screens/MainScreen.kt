@@ -35,12 +35,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -54,7 +57,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
@@ -66,6 +68,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -86,17 +89,23 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     component: MainComponent
 ) {
+    val haptic = LocalHapticFeedback.current
 
     val clickLambda = remember<(id: Long) -> Unit> {
         { component.onEvent(EditNote(it)) }
     }
+    val starClickLambda = remember<(id: Long, pinned: Boolean) -> Unit> {
+        { id, pinned -> component.onEvent(MainEvent.SetStarred(id = id, pinned = pinned)) }
+    }
     val longClickLambda = remember<(id: Long) -> Unit> {
-        { component.onEvent(ShowBottomSheet(it)) }
+        {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            component.onEvent(ShowBottomSheet(it)) }
     }
     val notes = component.notes.collectAsStateWithLifecycle(
         initialValue = emptyList(),
@@ -133,9 +142,11 @@ fun MainScreen(
                 notes.value[it].id
             }) { index ->
                 ItemGrid(
+                    modifier = Modifier.animateItemPlacement(tween(200)),
                     item = notes.value[index],
                     onItemClick = clickLambda,
                     onItemLongClick = longClickLambda,
+                    onStarClick = starClickLambda,
                 )
             }
         }
@@ -145,56 +156,70 @@ fun MainScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemGrid(
+    modifier: Modifier = Modifier,
     item: Note,
     onItemClick: (Long) -> Unit,
     onItemLongClick: (Long) -> Unit,
+    onStarClick: (Long, Boolean) -> Unit,
 ) {
-    val haptic = LocalHapticFeedback.current
-    val clickLambda = remember {
-        { onItemClick(item.id) }
-    }
-    val longClickLambda = remember {
-        {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            onItemLongClick(item.id)
-        }
-    }
+
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(4.dp)
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
-                onClick = clickLambda, onLongClick = longClickLambda
+                onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }
             ),
         colors = if (item.color != 0) CardDefaults.cardColors()
             .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
-            if (item.color == 0) 0.5.dp else 0.dp,if (item.color == 0) MaterialTheme.colorScheme.outline else Color.Transparent
+            if (item.color == 0) 0.5.dp else 0.dp,
+            if (item.color == 0) MaterialTheme.colorScheme.outline else Color.Transparent
         )
 
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-            if (item.title.isNotEmpty()) {
+        Row(Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .weight(1f)
+                    .fillMaxSize()
+            ) {
+                if (item.title.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        text = item.title,
+                        fontSize = 18.sp,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
                 Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = item.title,
-                    fontSize = 18.sp,
+                    text = RichTextState().setHtml(item.content).annotatedString,
+                    maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
+                    fontSize = 16.sp,
                 )
             }
-            Text(
-                text = RichTextState().setHtml(item.content).annotatedString,
-                maxLines = 8,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 16.sp,
-            )
+            IconButton(
+                onClick = { onStarClick(item.id, item.pinned) },
+            ) {
+                Icon(
+                    imageVector = if (item.pinned) Icons.Filled.Star else Icons.Filled.StarOutline,
+                    contentDescription = null
+                )
+            }
         }
     }
+}
+
+@Preview
+@Composable
+fun ItemGrinPreview() {
+    val note = Note(0, "Заметка", "Контент", color = 1, pinned = true)
+    ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { a, b -> })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -114,7 +114,7 @@ fun FormatButtons(
 
             IconButton(
                 painter = painterResource(id = R.drawable.ic_align_left),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.Left,
+                expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
                 color = color,
             ) {
                 component.onEvent(EditNoteEvent.SetAlignStart)

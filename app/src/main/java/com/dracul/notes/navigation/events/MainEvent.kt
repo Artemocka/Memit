@@ -6,6 +6,7 @@ import com.dracul.notes.data.CircleColor
 sealed interface MainEvent {
     data class EditNote(val id: Long) : MainEvent
     data class DeleteNote(val id: Long) : MainEvent
+    data class SetStarred(val id:Long, val pinned:Boolean) : MainEvent
     data class ShowBottomSheet(val id: Long) : MainEvent
     data object HideBottomSheet : MainEvent
     data object EditNoteModal : MainEvent

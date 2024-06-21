@@ -1,6 +1,7 @@
 package com.dracul.notes.navigation
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +12,8 @@ import com.dracul.notes.data.CircleColorList
 import com.dracul.notes.navigation.events.MainEvent
 import com.example.myapplication.DatabaseProviderWrap
 import com.mohamedrejeb.richeditor.model.RichTextState
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 
 class MainComponent(
     componentContext: ComponentContext,
@@ -23,7 +26,10 @@ class MainComponent(
     private var _colorsList: MutableState<List<CircleColor>> = mutableStateOf(emptyList())
     var colorsList: State<List<CircleColor>> = _colorsList
     val showBottomSheet: State<Boolean> = _showBottomSheet
-    val notes = DatabaseProviderWrap.noteDao.getAll()
+    val notes = DatabaseProviderWrap.noteDao.getAll().map { list ->
+        list.sortedBy { !it.pinned  }
+    }
+
 
 
     fun onEvent(event: MainEvent) {
@@ -109,6 +115,10 @@ class MainComponent(
                         DatabaseProviderWrap.noteDao.getById(it).copy(color = event.color.color)
                     DatabaseProviderWrap.noteDao.update(tempNote)
                 }
+            }
+
+            is MainEvent.SetStarred ->{
+                DatabaseProviderWrap.noteDao.updatePinnedById(event.id, !event.pinned)
             }
         }
     }
