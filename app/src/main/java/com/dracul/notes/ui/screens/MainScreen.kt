@@ -276,8 +276,7 @@ fun TopAppBarWithSearch(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = TextStyle(
-                            fontSize = 18.sp,
-                            lineHeight = 48.sp,
+                            fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         ),
                         singleLine = true,
@@ -292,7 +291,7 @@ fun TopAppBarWithSearch(
                                 isError = false,
                                 colors = colors,
                                 placeholder = { Text(text = "Search ") },
-                                contentPadding = PaddingValues(10.dp),
+                                contentPadding = PaddingValues(8.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 interactionSource = interactionSource,
                                 trailingIcon = {
@@ -303,14 +302,15 @@ fun TopAppBarWithSearch(
                                             onClick()
                                         })
                                 },
+                                leadingIcon = {
+                                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                                },
                             )
                         }
                     )
-
-
                 }
             } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Note", modifier = Modifier.weight(1f))
                     IconButton(onClick = onClick) {
                         Icon(imageVector = Icons.Filled.Search, contentDescription = null)
