@@ -33,14 +33,14 @@ class EditNoteComponent(
         }
     }
 
-
+    private var _isStarred = mutableStateOf(note.pinned)
+    var isStarred: State<Boolean> = _isStarred
     private var _title = mutableStateOf(note.title)
     var content = RichTextState().setHtml(note.content)
     val title: State<String> = _title
     val color: State<Int> = mutableIntStateOf(note.color)
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
-        note = note.copy(title = _title.value.trim(), content = content.toHtml())
-        Log.e(null, note.toString())
+        note = note.copy(title = _title.value.trim(), content = content.toHtml(), pinned = _isStarred.value)
         if (note.id.toInt() == 0)
             note.isEmptyOrInsert()
         else
@@ -59,7 +59,7 @@ class EditNoteComponent(
             }
 
             is EditNoteEvent.Back -> {
-                note = note.copy(title = _title.value.trim(), content = content.toHtml())
+                note = note.copy(title = _title.value.trim(), content = content.toHtml(), pinned = _isStarred.value)
                 if (note.id.toInt() == 0)
                     note.isEmptyOrInsert()
                 else
@@ -85,6 +85,10 @@ class EditNoteComponent(
 
             EditNoteEvent.SetUnderline -> {
                 content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+            }
+
+            EditNoteEvent.SetStarred -> {
+                _isStarred.value = !_isStarred.value
             }
         }
     }

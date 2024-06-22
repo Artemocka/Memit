@@ -17,6 +17,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,6 +61,7 @@ fun EditNoteScreen(
     val title = component.title
     val content = component.content
     val color by component.color
+    val isStarred by component.isStarred
 
     Scaffold(
         topBar = {
@@ -72,7 +75,12 @@ fun EditNoteScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors()
-                    .copy(containerColor = getColor(id = color))
+                    .copy(containerColor = getColor(id = color)),
+                actions = {
+                    IconButton(onClick = { component.onEvent(EditNoteEvent.SetStarred) }) {
+                        Icon(imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline , contentDescription = null)
+                    }
+                }
             )
         }, modifier = Modifier.background(color = getColor(id = color))
     ) { padding ->
