@@ -20,12 +20,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
@@ -241,6 +241,7 @@ fun ItemGrinPreview() {
     val note = Note(0, "Заметка", "Контент", color = 1, pinned = true)
     ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { a, b -> })
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarWithSearch(
@@ -352,15 +353,13 @@ fun BottomSheet(
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         windowInsets = WindowInsets(bottom = 0),
-
-        ) {
+    ) {
         val scrollState = rememberScrollState()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(scrollState),
-
-            ) {
+                .horizontalScroll(scrollState)
+        ) {
             repeat(colorList.value.size) {
                 when (it) {
                     0 -> {
@@ -415,22 +414,29 @@ fun BottomSheet(
 
             }
         })
-        BottomSheetRow(image = Icons.Filled.Delete, text = "Delete", onClick = {
-            deleteLambda()
-            scope.launch {
-                modalBottomSheetState.hide()
-            }.invokeOnCompletion {
-                onEvent(HideBottomSheet)
-
-            }
-        })
-        Spacer(modifier = Modifier.height(14.dp))
+        BottomSheetRow(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+            image = Icons.Filled.Delete,
+            text = "Delete",
+            onClick = {
+                deleteLambda()
+                scope.launch {
+                    modalBottomSheetState.hide()
+                }.invokeOnCompletion {
+                    onEvent(HideBottomSheet)
+                }
+            })
     }
 }
 
 @Composable
-fun BottomSheetRow(image: Painter, text: String, onClick: () -> Unit) {
-    Box(modifier = Modifier
+fun BottomSheetRow(
+    modifier: Modifier = Modifier,
+    image: Painter,
+    text: String,
+    onClick: () -> Unit
+) {
+    Box(modifier = modifier
         .fillMaxWidth()
         .clickable { onClick() }) {
         Row(modifier = Modifier.padding(vertical = 16.dp)) {
@@ -488,8 +494,13 @@ fun CircleColorItem(
 
 
 @Composable
-fun BottomSheetRow(image: ImageVector, text: String, onClick: () -> Unit) {
-    Box(modifier = Modifier
+fun BottomSheetRow(
+    modifier: Modifier = Modifier,
+    image: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    Box(modifier = modifier
         .fillMaxWidth()
         .clickable { onClick() }) {
         Row(modifier = Modifier.padding(vertical = 16.dp)) {
