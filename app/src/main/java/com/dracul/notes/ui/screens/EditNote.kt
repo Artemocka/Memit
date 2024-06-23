@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -81,7 +82,7 @@ fun EditNoteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = if (component.isCreate)"Create" else "Edit") },
+                title = { Text(text = if (component.isCreate) stringResource(R.string.create) else stringResource(R.string.create)) },
                 navigationIcon = {
                     IconButton({ component.onEvent(Back) }) {
                         Icon(
@@ -120,7 +121,7 @@ fun EditNoteScreen(
                 .navigationBarsPadding(),
         ) {
             OutlinedTextField(
-                placeholder = { Text(text = "Title (optional)") },
+                placeholder = { Text(text = stringResource(R.string.title_optional)) },
                 value = title.value,
                 onValueChange = { component.onEvent(UpdateTitle(it)) },
                 modifier = Modifier.fillMaxWidth(),
@@ -164,7 +165,7 @@ fun EditNoteScreen(
                         getBlendedColor(id = color), getBlendedColor(id = color)
                     ),
                 ),
-                placeholder = { Text(text = "Content") },
+                placeholder = { Text(text = stringResource(R.string.content)) },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Default,
                     keyboardType = KeyboardType.Text,

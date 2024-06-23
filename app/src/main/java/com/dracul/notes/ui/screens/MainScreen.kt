@@ -77,6 +77,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -288,7 +289,7 @@ fun TopAppBarWithSearch(
                                 visualTransformation = VisualTransformation.None,
                                 isError = false,
                                 colors = colors,
-                                placeholder = { Text(text = "Search ") },
+                                placeholder = { Text(text = stringResource(R.string.search)) },
                                 contentPadding = PaddingValues(8.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 interactionSource = interactionSource,
@@ -315,7 +316,7 @@ fun TopAppBarWithSearch(
                     modifier = Modifier.padding(end = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Note", modifier = Modifier.weight(1f))
+                    Text(text = stringResource(R.string.note), modifier = Modifier.weight(1f))
                     IconButton(onClick = onClick) {
                         Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                     }
@@ -380,7 +381,7 @@ fun BottomSheet(
                 }
             }
         }
-        BottomSheetRow(image = Icons.Filled.Edit, text = "Edit", onClick = {
+        BottomSheetRow(image = Icons.Filled.Edit, text = stringResource(R.string.edit), onClick = {
             editLambda()
             scope.launch {
                 modalBottomSheetState.hide()
@@ -391,7 +392,7 @@ fun BottomSheet(
         })
         BottomSheetRow(
             image = painterResource(id = R.drawable.ic_copy),
-            text = "Duplicate",
+            text = stringResource(R.string.duplicate),
             onClick = {
                 duplicateLambda()
                 scope.launch {
@@ -401,7 +402,7 @@ fun BottomSheet(
 
                 }
             })
-        BottomSheetRow(image = Icons.Filled.Share, text = "Share", onClick = {
+        BottomSheetRow(image = Icons.Filled.Share, text = stringResource(R.string.share), onClick = {
             shareLambda()
             scope.launch {
                 modalBottomSheetState.hide()
@@ -413,7 +414,7 @@ fun BottomSheet(
         BottomSheetRow(
             modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             image = Icons.Filled.Delete,
-            text = "Delete",
+            text = stringResource(id = R.string.delete),
             onClick = {
                 deleteLambda()
                 scope.launch {
@@ -444,7 +445,7 @@ fun BottomSheetRow(
             )
             Text(
                 text = text,
-                color = if (text == "Delete") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                color = if (text == stringResource(R.string.delete)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
             )
         }
     }

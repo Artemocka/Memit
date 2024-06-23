@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Notes</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="edit">Edit</string>
+    <string name="note">Notes</string>
+    <string name="search">"Search "</string>
+    <string name="create">Create</string>
+    <string name="title_optional">Title (optional)</string>
+    <string name="content">Content</string>
 </resources>

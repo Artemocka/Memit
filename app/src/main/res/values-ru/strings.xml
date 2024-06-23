@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="delete">Удалить</string>
+    <string name="share">Поделиться</string>
+    <string name="duplicate">Дублировать</string>
+    <string name="edit">Изменить</string>
+    <string name="note">Заметки</string>
+    <string name="search">Поиск</string>
+    <string name="create">Создать</string>
+    <string name="title_optional">Заголовок (необязательно)</string>
+    <string name="content">Содержание</string>
+</resources>
