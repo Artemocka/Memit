@@ -1,8 +1,6 @@
 package com.dracul.notes.data
 
-import android.content.Context
 import androidx.compose.runtime.Stable
-
 
 
 @Stable
@@ -10,6 +8,7 @@ data class CircleColor(val color: Int, val selected: Boolean = false)
 
 class CircleColorList() {
     private val list = listOf(
+        CircleColor(0),
         CircleColor(1),
         CircleColor(2),
         CircleColor(3),
@@ -21,7 +20,6 @@ class CircleColorList() {
         CircleColor(9),
         CircleColor(10),
         CircleColor(11),
-        CircleColor(12),
     )
 
     fun getColors(): List<CircleColor> {

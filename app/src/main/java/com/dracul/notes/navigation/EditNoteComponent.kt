@@ -1,6 +1,5 @@
 package com.dracul.notes.navigation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +9,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.notes.data.Note
@@ -36,11 +33,19 @@ class EditNoteComponent(
     private var _isStarred = mutableStateOf(note.pinned)
     var isStarred: State<Boolean> = _isStarred
     private var _title = mutableStateOf(note.title)
+    private val _color = mutableIntStateOf(note.color)
+    private val _showColorDialog= mutableStateOf(false)
+    val showColorDialog:State<Boolean> = _showColorDialog
     var content = RichTextState().setHtml(note.content)
     val title: State<String> = _title
-    val color: State<Int> = mutableIntStateOf(note.color)
+    val color: State<Int> =_color
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
-        note = note.copy(title = _title.value.trim(), content = content.toHtml(), pinned = _isStarred.value)
+        note = note.copy(
+            title = _title.value.trim(),
+            content = content.toHtml(),
+            pinned = _isStarred.value,
+             color = _color.intValue
+        )
         if (note.id.toInt() == 0)
             note.isEmptyOrInsert()
         else
@@ -49,7 +54,6 @@ class EditNoteComponent(
 
     init {
         backHandler.register(backCallback)
-
     }
 
     fun onEvent(event: EditNoteEvent) {
@@ -59,7 +63,12 @@ class EditNoteComponent(
             }
 
             is EditNoteEvent.Back -> {
-                note = note.copy(title = _title.value.trim(), content = content.toHtml(), pinned = _isStarred.value)
+                note = note.copy(
+                    title = _title.value.trim(),
+                    content = content.toHtml(),
+                    pinned = _isStarred.value,
+                    color = _color.intValue
+                )
                 if (note.id.toInt() == 0)
                     note.isEmptyOrInsert()
                 else
@@ -90,6 +99,19 @@ class EditNoteComponent(
             EditNoteEvent.SetStarred -> {
                 _isStarred.value = !_isStarred.value
             }
+
+            EditNoteEvent.DeleteNote -> {
+                if (note.id == 0.toLong()) {
+                    onGoBack()
+                } else {
+                    DatabaseProviderWrap.noteDao.delete(item = note)
+                    onGoBack()
+                }
+            }
+
+            EditNoteEvent.ShowColorPicker -> _showColorDialog.value = true
+            EditNoteEvent.HideColorPicker -> _showColorDialog.value = false
+            is EditNoteEvent.SetColor -> _color.intValue = event.color
         }
     }
 

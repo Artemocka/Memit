@@ -29,7 +29,8 @@ android {
             isMinifyEnabled = false
         }
         debug {
-            isDebuggable = true
+            isMinifyEnabled = true
+            isDebuggable = false
         }
 
     }

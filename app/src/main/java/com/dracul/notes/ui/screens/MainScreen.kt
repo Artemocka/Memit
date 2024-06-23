@@ -191,8 +191,8 @@ fun ItemGrid(
             .combinedClickable(
                 onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }
             ),
-        colors = if (item.color != 0) CardDefaults.cardColors()
-            .copy(containerColor = getColor(item.color)) else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        colors =  CardDefaults.cardColors()
+            .copy(containerColor = getColor(item.color)) ,
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
             if (item.color == 0) 0.5.dp else 0.dp,
@@ -253,9 +253,7 @@ fun TopAppBarWithSearch(
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
     val colors = TextFieldDefaults.colors(
-        focusedContainerColor = Color.Unspecified,
-        unfocusedContainerColor = Color.Unspecified,
-        disabledContainerColor = Color.Unspecified,
+        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
@@ -317,7 +315,6 @@ fun TopAppBarWithSearch(
                     }
                 }
             }
-
         })
 }
 
@@ -487,7 +484,7 @@ fun CircleColorItem(
                 modifier = modifier
                     .padding(horizontal = 4.dp)
                     .clip(CircleShape)
-                    .clickable { onClick(item) })
+                    .noRippleClickable { onClick(item) })
         }
     }
 }
@@ -535,8 +532,7 @@ fun getColor(id: Int): Color {
         9 -> colorResource(R.color.color9)
         10 -> colorResource(R.color.color10)
         11 -> colorResource(R.color.color11)
-        12 -> colorResource(R.color.color12)
-        else -> MaterialTheme.colorScheme.background
+        else -> MaterialTheme.colorScheme.secondaryContainer
     }
 }
 
@@ -545,6 +541,12 @@ fun getBlendedColor(id: Int): Color {
     val color = getColor(id = id)
     val white = colorResource(id = R.color.white)
     return lerp(color, white, 0.35f)
+}
+@Composable
+fun getBlendedCardColor(id: Int): Color {
+    val color = getColor(id = id)
+    val black = colorResource(id = R.color.black)
+    return lerp(color, black, 0.1f)
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
