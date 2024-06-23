@@ -191,8 +191,8 @@ fun ItemGrid(
             .combinedClickable(
                 onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }
             ),
-        colors =  CardDefaults.cardColors()
-            .copy(containerColor = getColor(item.color)) ,
+        colors = CardDefaults.cardColors()
+            .copy(containerColor = getColor(item.color)),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
             if (item.color == 0) 0.5.dp else 0.dp,
@@ -301,14 +301,20 @@ fun TopAppBarWithSearch(
                                         })
                                 },
                                 leadingIcon = {
-                                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                                    Icon(
+                                        imageVector = Icons.Filled.Search,
+                                        contentDescription = null
+                                    )
                                 },
                             )
                         }
                     )
                 }
             } else {
-                Row(modifier = Modifier.padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(text = "Note", modifier = Modifier.weight(1f))
                     IconButton(onClick = onClick) {
                         Icon(imageVector = Icons.Filled.Search, contentDescription = null)
@@ -356,28 +362,21 @@ fun BottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(scrollState)
+                .padding(bottom = 8.dp)
         ) {
             repeat(colorList.value.size) {
                 when (it) {
-                    0 -> {
-                        CircleColorItem(
-                            modifier = Modifier.padding(start = 8.dp),
-                            item = colorList.value[it],
-                            onClick = onColorClick
-                        )
-                    }
-
-                    colorList.value.lastIndex -> {
-                        CircleColorItem(
-                            modifier = Modifier.padding(end = 8.dp),
-                            item = colorList.value[it],
-                            onClick = onColorClick
-                        )
-                    }
-
-                    else -> {
-                        CircleColorItem(item = colorList.value[it], onClick = onColorClick)
-                    }
+                    0 -> CircleColorItem(
+                        modifier = Modifier.padding(start = 8.dp),
+                        item = colorList.value[it],
+                        onClick = onColorClick
+                    )
+                    colorList.value.lastIndex -> CircleColorItem(
+                        modifier = Modifier.padding(end = 8.dp),
+                        item = colorList.value[it],
+                        onClick = onColorClick
+                    )
+                    else -> CircleColorItem(item = colorList.value[it], onClick = onColorClick)
                 }
             }
         }
@@ -542,6 +541,7 @@ fun getBlendedColor(id: Int): Color {
     val white = colorResource(id = R.color.white)
     return lerp(color, white, 0.35f)
 }
+
 @Composable
 fun getBlendedCardColor(id: Int): Color {
     val color = getColor(id = id)
