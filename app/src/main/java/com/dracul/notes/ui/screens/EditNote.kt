@@ -81,7 +81,7 @@ fun EditNoteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Create Note") },
+                title = { Text(text = if (component.isCreate)"Create" else "Edit") },
                 navigationIcon = {
                     IconButton({ component.onEvent(Back) }) {
                         Icon(
