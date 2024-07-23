@@ -15,7 +15,7 @@ android {
         applicationId = "com.dracul.notes"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -55,6 +55,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences-core:1.1.1")
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.material)
     implementation(libs.richeditor.compose)

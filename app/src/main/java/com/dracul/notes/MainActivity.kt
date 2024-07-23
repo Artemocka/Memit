@@ -17,27 +17,52 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.retainedComponent
+import com.dracul.notes.data.Note
 import com.dracul.notes.navigation.RootComponent
+import com.dracul.notes.ui.components.Prefs
 import com.dracul.notes.ui.screens.EditNoteScreen
 import com.dracul.notes.ui.screens.MainScreen
 import com.dracul.notes.ui.theme.NotesTheme
+import com.example.myapplication.DatabaseProviderWrap
 
 
 class MainActivity : ComponentActivity() {
     private val activityViewModel by viewModels<ActivityViewModel>()
+
     @OptIn(ExperimentalDecomposeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityViewModel
+        val prefs = Prefs(context = applicationContext)
+        if (prefs.isFirstLaunch ) {
+            DatabaseProviderWrap.noteDao.insert(
+                Note(
+                    0.toLong(),
+                    title = getString(R.string.tip),
+                    content = getString(R.string.welcome),
+                    color = 0,
+                    pinned = true,
+                )
+            )
+            DatabaseProviderWrap.noteDao.insert(
+                Note(
+                    0.toLong(),
+                    title = getString(R.string.tip),
+                    content = getString(R.string.welcome_2),
+                    color = 0,
+                    pinned = true,
+                )
+            )
+        }
         val root = retainedComponent {
             RootComponent(it)
         }
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
+                android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT
             )
         )
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             App(component = root)
@@ -49,8 +74,7 @@ class MainActivity : ComponentActivity() {
 fun App(component: RootComponent) {
     NotesTheme {
         Children(
-            stack = component.childStack,
-            animation = stackAnimation(
+            stack = component.childStack, animation = stackAnimation(
                 fade(tween(300, easing = EaseInOut)) + slide(tween(300, easing = EaseInOut))
             )
         ) { child ->

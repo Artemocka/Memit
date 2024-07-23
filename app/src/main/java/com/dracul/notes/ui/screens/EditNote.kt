@@ -81,8 +81,13 @@ fun EditNoteScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = if (component.isCreate) stringResource(R.string.create) else stringResource(R.string.create)) },
+            TopAppBar(title = {
+                Text(
+                    text = if (component.isCreate) stringResource(R.string.create) else stringResource(
+                        R.string.create
+                    )
+                )
+            },
                 navigationIcon = {
                     IconButton({ component.onEvent(Back) }) {
                         Icon(
@@ -94,25 +99,28 @@ fun EditNoteScreen(
                     .copy(containerColor = getColor(id = color)),
                 actions = {
                     IconButton(onClick = { component.onEvent(EditNoteEvent.ShowColorPicker) }) {
-                        Icon(imageVector = Icons.Filled.ColorLens  , contentDescription = "Delete")
+                        Icon(imageVector = Icons.Filled.ColorLens, contentDescription = "Delete")
                     }
                     IconButton(onClick = { component.onEvent(EditNoteEvent.DeleteNote) }) {
-                        Icon(imageVector = Icons.Filled.Delete  , contentDescription = "Delete")
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete")
                     }
                     IconButton(onClick = { component.onEvent(EditNoteEvent.SetStarred) }) {
-                        Icon(imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline , contentDescription = null)
+                        Icon(
+                            imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline,
+                            contentDescription = null
+                        )
                     }
-                }
-            )
+                })
         }, modifier = Modifier.background(color = getColor(id = color))
     ) { padding ->
 
-        if (component.showColorDialog.value){
-            ColorPickerDialog(currentColor = color, onDismiss = { component.onEvent(EditNoteEvent.HideColorPicker)}) {
+        if (component.showColorDialog.value) {
+            ColorPickerDialog(currentColor = color,
+                onDismiss = { component.onEvent(EditNoteEvent.HideColorPicker) }) {
                 component.onEvent(EditNoteEvent.SetColor(it))
             }
         }
-        
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -172,12 +180,8 @@ fun EditNoteScreen(
                     capitalization = KeyboardCapitalization.Sentences
                 ),
             )
-
             FormatButtons(
-                isFocused = isFocused,
-                content = content,
-                component = component,
-                color = color
+                isFocused = isFocused, content = content, component = component, color = color
             )
 
         }
@@ -187,25 +191,23 @@ fun EditNoteScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColorPickerDialog(currentColor:Int,onDismiss:()->Unit,setColor:(Int)->Unit) {
-    Dialog(onDismissRequest = onDismiss ) {
+fun ColorPickerDialog(currentColor: Int, onDismiss: () -> Unit, setColor: (Int) -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
         Card(
-            colors = CardDefaults.cardColors().copy(containerColor = getBlendedCardColor(id = currentColor)),
+            colors = CardDefaults.cardColors()
+                .copy(containerColor = getBlendedCardColor(id = currentColor)),
             shape = RoundedCornerShape(32.dp)
         ) {
             FlowRow(modifier = Modifier.padding(8.dp), Arrangement.Center) {
-                repeat(12){colorId->
+                repeat(12) { colorId ->
                     val iconColor = getColor(id = colorId)
-                    AnimatedContent(targetState =  (currentColor == colorId),
-                        transitionSpec = {
-                            scaleIn(
-                                tween(200, easing = EaseIn),
-                                initialScale = 0.95f
-                            ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
-                                tween(200, easing = EaseOut),
-                                targetScale = 0.85f
-                            ) + fadeOut(targetAlpha = 0.9f)
-                        }) {
+                    AnimatedContent(targetState = (currentColor == colorId), transitionSpec = {
+                        scaleIn(
+                            tween(200, easing = EaseIn), initialScale = 0.95f
+                        ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
+                            tween(200, easing = EaseOut), targetScale = 0.85f
+                        ) + fadeOut(targetAlpha = 0.9f)
+                    }) {
                         if (it) {
                             Image(painter = painterResource(id = R.drawable.ic_selected_circle),
                                 colorFilter = ColorFilter.tint(iconColor),
@@ -213,8 +215,7 @@ fun ColorPickerDialog(currentColor:Int,onDismiss:()->Unit,setColor:(Int)->Unit) 
                                 modifier = Modifier
                                     .padding(4.dp)
                                     .clip(CircleShape)
-                                    .noRippleClickable { setColor(colorId) }
-                            )
+                                    .noRippleClickable { setColor(colorId) })
                         } else {
                             Image(painter = painterResource(id = R.drawable.ic_circle),
                                 colorFilter = ColorFilter.tint(iconColor),
@@ -227,7 +228,6 @@ fun ColorPickerDialog(currentColor:Int,onDismiss:()->Unit,setColor:(Int)->Unit) 
                     }
                 }
             }
-
         }
     }
 }

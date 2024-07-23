@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Notes</string>
+    <string name="app_name">Memit</string>
     <string name="delete">Удалить</string>
     <string name="share">Поделиться</string>
     <string name="duplicate">Дублировать</string>
@@ -10,4 +10,7 @@
     <string name="create">Создать</string>
     <string name="title_optional">Заголовок (необязательно)</string>
     <string name="content">Содержание</string>
+    <string name="welcome_2">Нажмите для редактирования</string>
+    <string name="welcome">Нажмите и держите, пока не появится меню снизу</string>
+    <string name="tip">Подсказка</string>
 </resources>
