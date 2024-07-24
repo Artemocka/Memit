@@ -41,14 +41,23 @@ class MainActivity : ComponentActivity() {
                     title = getString(R.string.tip),
                     content = getString(R.string.welcome),
                     color = 0,
-                    pinned = true,
+                    pinned = false,
                 )
             )
             DatabaseProviderWrap.noteDao.insert(
                 Note(
                     0.toLong(),
                     title = getString(R.string.tip),
-                    content = getString(R.string.welcome_2),
+                    content = getString(R.string.welcome2),
+                    color = 0,
+                    pinned = false,
+                )
+            )
+            DatabaseProviderWrap.noteDao.insert(
+                Note(
+                    0.toLong(),
+                    title = getString(R.string.tip),
+                    content = getString(R.string.welcome3),
                     color = 0,
                     pinned = true,
                 )

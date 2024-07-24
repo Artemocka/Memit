@@ -9,7 +9,8 @@
     <string name="create">Create</string>
     <string name="title_optional">Title (optional)</string>
     <string name="content">Content</string>
-    <string name="welcome_2">Tap to edit</string>
-    <string name="welcome">Press and hold until you see the bottomsheet</string>
+    <string name="welcome"><![CDATA[<p><b>Tap</b> to <u>edit</u></p>]]></string>
     <string name="tip">Tip</string>
+    <string name="welcome2"><![CDATA[<p><b>Press</b> and <b>hold</b> until you see the <b>bottomsheet</b></p>]]></string>
+    <string name="welcome3"><![CDATA[<p><b>Tap</b> on the <b>star</b> to <u>pin</u> the <b>note</b></p>]]></string>
 </resources>

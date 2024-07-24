@@ -1,5 +1,6 @@
 package com.dracul.notes.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
@@ -9,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -126,24 +126,22 @@ fun MainScreen(
     )
     val showBottomSheet = component.showBottomSheet
     val text = component.searchQuery.collectAsStateWithLifecycle(
-        initialValue = "",
-        lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+        initialValue = "", lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
     )
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "add")
-            }
-        }, topBar = {
-            TopAppBarWithSearch(
-                showSearchBox = component.showSearchBar.value,
-                text = text.value,
-                onEdit = {
-                    component.onEvent(MainEvent.SetSearchQuery(it))
-                }) {
-                component.onEvent(MainEvent.ShowSearchBar)
-            }
-        }) { padding ->
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = { component.onEvent(CreateNote) }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+        }
+    }, topBar = {
+        TopAppBarWithSearch(
+            showSearchBox = component.showSearchBar.value,
+            text = text.value,
+            onEdit = {
+                component.onEvent(MainEvent.SetSearchQuery(it))
+            }) {
+            component.onEvent(MainEvent.ShowSearchBar)
+        }
+    }) { padding ->
         if (showBottomSheet.value) {
             BottomSheet(onDismiss = {
                 component.onEvent(HideBottomSheet)
@@ -189,17 +187,10 @@ fun ItemGrid(
             .fillMaxSize()
             .padding(4.dp)
             .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }
-            ),
-        colors = CardDefaults.cardColors()
-            .copy(containerColor = getColor(item.color)),
+            .combinedClickable(onClick = { onItemClick(item.id) },
+                onLongClick = { onItemLongClick(item.id) }),
+        colors = CardDefaults.cardColors().copy(containerColor = getColor(item.color)),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(
-            if (item.color == 0) 0.5.dp else 0.dp,
-            if (item.color == 0) MaterialTheme.colorScheme.outline else Color.Transparent
-        )
-
     ) {
         Row(Modifier.fillMaxSize()) {
             Column(
@@ -246,10 +237,7 @@ fun ItemGrinPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarWithSearch(
-    showSearchBox: Boolean,
-    text: String,
-    onEdit: (String) -> Unit,
-    onClick: () -> Unit
+    showSearchBox: Boolean, text: String, onEdit: (String) -> Unit, onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
@@ -258,71 +246,65 @@ fun TopAppBarWithSearch(
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
-    TopAppBar(
-        title = {
-            if (showSearchBox) {
-                Row(
-                    modifier = Modifier.padding(end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SideEffect {
-                        focusRequester.requestFocus()
-                    }
-                    BasicTextField(
-                        value = text,
-                        onValueChange = onEdit,
-                        modifier = Modifier
-                            .weight(1f)
-                            .focusRequester(focusRequester),
-                        textStyle = TextStyle(
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        singleLine = true,
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                        decorationBox = {
-                            TextFieldDefaults.DecorationBox(
-                                value = text,
-                                innerTextField = it,
-                                enabled = true,
-                                singleLine = true,
-                                visualTransformation = VisualTransformation.None,
-                                isError = false,
-                                colors = colors,
-                                placeholder = { Text(text = stringResource(R.string.search)) },
-                                contentPadding = PaddingValues(8.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                interactionSource = interactionSource,
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = null,
-                                        modifier = Modifier.clickable {
-                                            onClick()
-                                        })
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Search,
-                                        contentDescription = null
-                                    )
-                                },
-                            )
-                        }
-                    )
+    TopAppBar(title = {
+        if (showSearchBox) {
+            Row(
+                modifier = Modifier.padding(end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SideEffect {
+                    focusRequester.requestFocus()
                 }
-            } else {
-                Row(
-                    modifier = Modifier.padding(end = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = stringResource(R.string.note), modifier = Modifier.weight(1f))
-                    IconButton(onClick = onClick) {
-                        Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-                    }
+                BasicTextField(value = text,
+                    onValueChange = onEdit,
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester),
+                    textStyle = TextStyle(
+                        fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    singleLine = true,
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                    decorationBox = {
+                        TextFieldDefaults.DecorationBox(
+                            value = text,
+                            innerTextField = it,
+                            enabled = true,
+                            singleLine = true,
+                            visualTransformation = VisualTransformation.None,
+                            isError = false,
+                            colors = colors,
+                            placeholder = { Text(text = stringResource(R.string.search)) },
+                            contentPadding = PaddingValues(8.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            interactionSource = interactionSource,
+                            trailingIcon = {
+                                Icon(imageVector = Icons.Filled.Close,
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable {
+                                        onClick()
+                                    })
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Search, contentDescription = null
+                                )
+                            },
+                        )
+                    })
+            }
+        } else {
+            Row(
+                modifier = Modifier.padding(end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = stringResource(R.string.note), modifier = Modifier.weight(1f))
+                IconButton(onClick = onClick) {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                 }
             }
-        })
+        }
+    })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -372,11 +354,13 @@ fun BottomSheet(
                         item = colorList.value[it],
                         onClick = onColorClick
                     )
+
                     colorList.value.lastIndex -> CircleColorItem(
                         modifier = Modifier.padding(end = 8.dp),
                         item = colorList.value[it],
                         onClick = onColorClick
                     )
+
                     else -> CircleColorItem(item = colorList.value[it], onClick = onColorClick)
                 }
             }
@@ -390,8 +374,7 @@ fun BottomSheet(
 
             }
         })
-        BottomSheetRow(
-            image = painterResource(id = R.drawable.ic_copy),
+        BottomSheetRow(image = painterResource(id = R.drawable.ic_copy),
             text = stringResource(R.string.duplicate),
             onClick = {
                 duplicateLambda()
@@ -402,17 +385,18 @@ fun BottomSheet(
 
                 }
             })
-        BottomSheetRow(image = Icons.Filled.Share, text = stringResource(R.string.share), onClick = {
-            shareLambda()
-            scope.launch {
-                modalBottomSheetState.hide()
-            }.invokeOnCompletion {
-                onEvent(HideBottomSheet)
+        BottomSheetRow(image = Icons.Filled.Share,
+            text = stringResource(R.string.share),
+            onClick = {
+                shareLambda()
+                scope.launch {
+                    modalBottomSheetState.hide()
+                }.invokeOnCompletion {
+                    onEvent(HideBottomSheet)
 
-            }
-        })
-        BottomSheetRow(
-            modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                }
+            })
+        BottomSheetRow(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             image = Icons.Filled.Delete,
             text = stringResource(id = R.string.delete),
             onClick = {
@@ -428,10 +412,7 @@ fun BottomSheet(
 
 @Composable
 fun BottomSheetRow(
-    modifier: Modifier = Modifier,
-    image: Painter,
-    text: String,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier, image: Painter, text: String, onClick: () -> Unit
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
@@ -453,21 +434,16 @@ fun BottomSheetRow(
 
 @Composable
 fun CircleColorItem(
-    modifier: Modifier = Modifier,
-    item: CircleColor,
-    onClick: (CircleColor) -> Unit
+    modifier: Modifier = Modifier, item: CircleColor, onClick: (CircleColor) -> Unit
 ) {
     val color = getColor(id = item.color)
-    AnimatedContent(targetState = item.selected,
-        transitionSpec = {
-            scaleIn(
-                tween(200, easing = EaseIn),
-                initialScale = 0.95f
-            ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
-                tween(200, easing = EaseOut),
-                targetScale = 0.85f
-            ) + fadeOut(targetAlpha = 0.9f)
-        }) {
+    AnimatedContent(targetState = item.selected, transitionSpec = {
+        scaleIn(
+            tween(200, easing = EaseIn), initialScale = 0.95f
+        ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
+            tween(200, easing = EaseOut), targetScale = 0.85f
+        ) + fadeOut(targetAlpha = 0.9f)
+    }) {
         if (it) {
             Image(painter = painterResource(id = R.drawable.ic_selected_circle),
                 colorFilter = ColorFilter.tint(color),
@@ -475,8 +451,7 @@ fun CircleColorItem(
                 modifier = modifier
                     .padding(horizontal = 4.dp)
                     .clip(CircleShape)
-                    .noRippleClickable { onClick(item) }
-            )
+                    .noRippleClickable { onClick(item) })
         } else {
             Image(painter = painterResource(id = R.drawable.ic_circle),
                 colorFilter = ColorFilter.tint(color),
@@ -492,10 +467,7 @@ fun CircleColorItem(
 
 @Composable
 fun BottomSheetRow(
-    modifier: Modifier = Modifier,
-    image: ImageVector,
-    text: String,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier, image: ImageVector, text: String, onClick: () -> Unit
 ) {
     Box(modifier = modifier
         .fillMaxWidth()

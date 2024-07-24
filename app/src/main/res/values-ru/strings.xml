@@ -10,7 +10,8 @@
     <string name="create">Создать</string>
     <string name="title_optional">Заголовок (необязательно)</string>
     <string name="content">Содержание</string>
-    <string name="welcome_2">Нажмите для редактирования</string>
-    <string name="welcome">Нажмите и держите, пока не появится меню снизу</string>
     <string name="tip">Подсказка</string>
+    <string name="welcome"><![CDATA[<p><b>Нажмите</b> для <u>редактирования</u></p>]]></string>
+    <string name="welcome2"><![CDATA[<p><b>Нажмите</b> и <b>держите</b> пока не увидите <b>нижнее меню</b></p>]]></string>
+    <string name="welcome3"><![CDATA[<p><b>Нажмите</b> на <b>звезду</b> чтобы <u>закрепить</u> <b>заметку</b></p>]]></string>
 </resources>
