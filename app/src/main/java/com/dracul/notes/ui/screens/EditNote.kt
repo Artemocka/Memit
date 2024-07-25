@@ -154,7 +154,7 @@ fun EditNoteScreen(
             val interactionSource = remember { MutableInteractionSource() }
             val isFocused by interactionSource.collectIsFocusedAsState()
             RichTextEditor(
-                state = content,
+                state = content.value,
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
@@ -177,13 +177,12 @@ fun EditNoteScreen(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Default,
                     keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
+                    capitalization = KeyboardCapitalization.Sentences,
                 ),
             )
             FormatButtons(
-                isFocused = isFocused, content = content, component = component, color = color
+                isFocused = isFocused, content = content.value, component = component, color = color
             )
-
         }
     }
 }

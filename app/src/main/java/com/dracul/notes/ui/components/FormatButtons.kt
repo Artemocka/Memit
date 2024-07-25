@@ -7,14 +7,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -42,38 +47,32 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FormatButtons(
-    isFocused: Boolean,
-    content: RichTextState,
-    component: EditNoteComponent,
-    color: Int
+    isFocused: Boolean, content: RichTextState, component: EditNoteComponent, color: Int
 ) {
+    val scrollState = rememberScrollState()
 
-    val underlineExpr = content.currentSpanStyle.textDecoration == TextDecoration.Underline ||
-            content.currentSpanStyle.textDecoration?.contains(
-                TextDecoration.combine(
-                    listOf(TextDecoration.Underline, TextDecoration.LineThrough)
-                )
-            ) == true
-    val lineThroughExpr = content.currentSpanStyle.textDecoration == TextDecoration.LineThrough ||
-            content.currentSpanStyle.textDecoration?.contains(
-                TextDecoration.combine(
-                    listOf(TextDecoration.Underline, TextDecoration.LineThrough)
-                )
-            ) == true
+    val underlineExpr =
+        content.currentSpanStyle.textDecoration == TextDecoration.Underline || content.currentSpanStyle.textDecoration?.contains(
+            TextDecoration.combine(
+                listOf(TextDecoration.Underline, TextDecoration.LineThrough)
+            )
+        ) == true
+    val lineThroughExpr =
+        content.currentSpanStyle.textDecoration == TextDecoration.LineThrough || content.currentSpanStyle.textDecoration?.contains(
+            TextDecoration.combine(
+                listOf(TextDecoration.Underline, TextDecoration.LineThrough)
+            )
+        ) == true
 
     AnimatedVisibility(
         visible = isFocused, enter = slideInVertically(
 
-            initialOffsetY = { +it },
-            animationSpec = tween(
-                200,
-                delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
+            initialOffsetY = { +it }, animationSpec = tween(
+                200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
             )
         ) + fadeIn(tween(200)), exit = slideOutVertically(
-            targetOffsetY = { +it },
-            animationSpec = tween(
-                200,
-                delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
+            targetOffsetY = { +it }, animationSpec = tween(
+                200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
             )
         ) + fadeOut(tween(200))
     ) {
@@ -82,64 +81,78 @@ fun FormatButtons(
                 .imePadding()
                 .padding(horizontal = 2.dp)
         ) {
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_bold),
-                expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetBold)
+            IconButton(imageVector = Icons.AutoMirrored.Filled.Undo, color = color, enabled = component.isHasPrev.value) {
+                component.onEvent(EditNoteEvent.Undo)
             }
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_italic),
-                expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetItalic)
-            }
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_linethrough),
-                expr = lineThroughExpr,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetLinethrough)
-            }
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_underline),
-                expr = underlineExpr,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetUnderline)
+            IconButton(imageVector = Icons.AutoMirrored.Filled.Redo, color = color, enabled = component.isHasNext.value) {
+                component.onEvent(EditNoteEvent.Redo)
             }
 
+          Row(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .horizontalScroll(scrollState)
+          ) {
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_bold),
+                  expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetBold)
+              }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_italic),
+                  expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetItalic)
+              }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_linethrough),
+                  expr = lineThroughExpr,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetLinethrough)
+              }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_underline),
+                  expr = underlineExpr,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetUnderline)
+              }
 
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_align_left),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignStart)
-            }
 
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_align_center),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignCenter)
-            }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_align_left),
+                  expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetAlignStart)
+              }
 
-            IconButton(
-                painter = painterResource(id = R.drawable.ic_align_right),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.End,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignEnd)
-            }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_align_center),
+                  expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetAlignCenter)
+              }
 
-            IconButton(imageVector = Icons.Filled.Clear, color = color) {
-                component.onEvent(EditNoteEvent.ClearALl)
-            }
+              IconButton(
+                  painter = painterResource(id = R.drawable.ic_align_right),
+                  expr = content.currentParagraphStyle.textAlign == TextAlign.End,
+                  color = color,
+              ) {
+                  component.onEvent(EditNoteEvent.SetAlignEnd)
+              }
 
+              IconButton(imageVector = Icons.Filled.Clear, color = color) {
+                  component.onEvent(EditNoteEvent.ClearALl)
+              }
+
+
+          }
         }
     }
 }
@@ -164,6 +177,7 @@ fun IconButton(
         ),
         shape = RoundedCornerShape(32),
         border = BorderStroke(0.dp, color = Color.Transparent),
+
     ) {
         Icon(
             painter = painter, contentDescription = null
@@ -175,6 +189,7 @@ fun IconButton(
 fun IconButton(
     imageVector: ImageVector,
     color: Int,
+    enabled: Boolean = true,
     onClick: (() -> Unit),
 ) {
     OutlinedIconButton(
@@ -185,6 +200,7 @@ fun IconButton(
         ),
         shape = RoundedCornerShape(32),
         border = BorderStroke(0.dp, color = Color.Transparent),
+        enabled = enabled,
     ) {
         Icon(
             imageVector = imageVector, contentDescription = null

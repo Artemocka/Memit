@@ -17,5 +17,7 @@ sealed interface EditNoteEvent {
     data object SetAlignEnd : EditNoteEvent
     data object ShowColorPicker : EditNoteEvent
     data object HideColorPicker : EditNoteEvent
+    data object Undo : EditNoteEvent
+    data object Redo : EditNoteEvent
 }
 

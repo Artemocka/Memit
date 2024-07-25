@@ -13,8 +13,13 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.notes.data.Note
 import com.dracul.notes.navigation.events.EditNoteEvent
+import com.dracul.notes.utills.History
 import com.example.myapplication.DatabaseProviderWrap
 import com.mohamedrejeb.richeditor.model.RichTextState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class EditNoteComponent(
     id: Long?,
@@ -36,13 +41,13 @@ class EditNoteComponent(
     private val _color = mutableIntStateOf(note.color)
     private val _showColorDialog = mutableStateOf(false)
     val showColorDialog: State<Boolean> = _showColorDialog
-    var content = RichTextState().setHtml(note.content)
+    var content = mutableStateOf(RichTextState().setHtml(note.content).copy())
     val title: State<String> = _title
     val color: State<Int> = _color
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
         note = note.copy(
             title = _title.value.trim(),
-            content = content.toHtml(),
+            content = content.value.toHtml(),
             pinned = _isStarred.value,
             color = _color.intValue
         )
@@ -51,11 +56,24 @@ class EditNoteComponent(
         else
             note.isEmptyOrUpdate()
     }
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var history:History = History(RichTextState().setHtml(note.content).copy())
 
     init {
         backHandler.register(backCallback)
+        coroutineScope.launch {
+            while (true){
+                if (
+                    history.current.value.value.annotatedString.hashCode() != content.value.annotatedString.hashCode()
+                ){
+                    history.add(content.value.copy())
+                }
+                delay(750 )
+            }
+        }
     }
-
+    val isHasNext:State<Boolean> = history.isHasNext
+    val isHasPrev:State<Boolean> = history.isHasPrev
     fun onEvent(event: EditNoteEvent) {
         when (event) {
             is EditNoteEvent.UpdateTitle -> {
@@ -65,7 +83,7 @@ class EditNoteComponent(
             is EditNoteEvent.Back -> {
                 note = note.copy(
                     title = _title.value.trim(),
-                    content = content.toHtml(),
+                    content = content.value.toHtml(),
                     pinned = _isStarred.value,
                     color = _color.intValue
                 )
@@ -75,25 +93,25 @@ class EditNoteComponent(
                     note.isEmptyOrUpdate()
             }
 
-            EditNoteEvent.SetBold -> content.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            EditNoteEvent.SetItalic -> content.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-            EditNoteEvent.SetLinethrough -> content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-            EditNoteEvent.SetAlignCenter -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Center))
-            EditNoteEvent.SetAlignEnd -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
-            EditNoteEvent.SetAlignStart -> content.toggleParagraphStyle(ParagraphStyle(TextAlign.Start))
+            EditNoteEvent.SetBold -> content.value.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+            EditNoteEvent.SetItalic -> content.value.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+            EditNoteEvent.SetLinethrough -> content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+            EditNoteEvent.SetAlignCenter -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.Center))
+            EditNoteEvent.SetAlignEnd -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
+            EditNoteEvent.SetAlignStart -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.Start))
             EditNoteEvent.ClearALl -> {
-                content.currentSpanStyle.textDecoration?.let {
+                content.value.currentSpanStyle.textDecoration?.let {
                     if (it.contains(TextDecoration.Underline))
-                        content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                        content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
                     if (it.contains(TextDecoration.LineThrough))
-                        content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+                        content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
                 }
-                content.toggleSpanStyle(content.currentSpanStyle)
-                content.removeParagraphStyle(paragraphStyle = content.currentParagraphStyle)
+                content.value.toggleSpanStyle(content.value.currentSpanStyle)
+                content.value.removeParagraphStyle(paragraphStyle = content.value.currentParagraphStyle)
             }
 
             EditNoteEvent.SetUnderline -> {
-                content.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
             }
 
             EditNoteEvent.SetStarred -> {
@@ -112,6 +130,14 @@ class EditNoteComponent(
             EditNoteEvent.ShowColorPicker -> _showColorDialog.value = true
             EditNoteEvent.HideColorPicker -> _showColorDialog.value = false
             is EditNoteEvent.SetColor -> _color.intValue = event.color
+            EditNoteEvent.Redo -> {
+                history.next()
+                content.value = history.current.value.value.copy()
+            }
+            EditNoteEvent.Undo -> {
+                history.prev()
+                content.value = history.current.value.value.copy()
+            }
         }
     }
 
