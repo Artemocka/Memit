@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
+import com.dracul.feature_main.nav_component.MainComponent
 import kotlinx.serialization.Serializable
 
 class RootComponent(
@@ -35,7 +36,7 @@ class RootComponent(
             )
 
             is Configuration.EditNote -> Child.EditNote(
-                EditNoteComponent(
+                com.dracul.feature_edit.nav_component.EditNoteComponent(
                     id = config.id,
                     componentContext = context,
                     onGoBack = { navigation.pop() },
@@ -51,7 +52,7 @@ class RootComponent(
 
     sealed class Child {
         data class MainScreen(val component: MainComponent) : Child()
-        data class EditNote(val component: EditNoteComponent) : Child()
+        data class EditNote(val component: com.dracul.feature_edit.nav_component.EditNoteComponent) : Child()
     }
 
     @Serializable

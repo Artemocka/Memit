@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Memit</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="edit">Edit</string>
+    <string name="note">Notes</string>
+    <string name="search">"Search "</string>
+    <string name="create">Create</string>
+    <string name="title_optional">Title (optional)</string>
+    <string name="content">Content</string>
+    <string name="welcome"><![CDATA[<p><b>Tap</b> to <u>edit</u></p>]]></string>
+    <string name="tip">Tip</string>
+    <string name="welcome2"><![CDATA[<p><b>Press</b> and <b>hold</b> until you see the <b>bottomsheet</b></p>]]></string>
+    <string name="welcome3"><![CDATA[<p><b>Tap</b> on the <b>star</b> to <u>pin</u> the <b>note</b></p>]]></string>
+</resources>

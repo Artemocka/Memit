@@ -17,17 +17,21 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.retainedComponent
-import com.dracul.notes.data.Note
+import com.dracul.common.aliases.CommonStrings
+import com.dracul.feature_edit.ui.EditNoteScreen
+import com.dracul.notes.domain.models.Note
 import com.dracul.notes.navigation.RootComponent
-import com.dracul.notes.ui.components.Prefs
-import com.dracul.notes.ui.screens.EditNoteScreen
-import com.dracul.notes.ui.screens.MainScreen
+import com.dracul.notes.components.Prefs
 import com.dracul.notes.ui.theme.NotesTheme
-import com.example.myapplication.DatabaseProviderWrap
+import com.dracul.feature_main.MainScreen
+import com.dracul.notes.domain.usecase.InsertNoteUseCase
+import com.dracul.notes.viewmodels.ActivityViewModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), KoinComponent {
     private val activityViewModel by viewModels<ActivityViewModel>()
+    private val insertNoteUseCase by inject<InsertNoteUseCase>()
 
     @OptIn(ExperimentalDecomposeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,29 +39,29 @@ class MainActivity : ComponentActivity() {
         activityViewModel
         val prefs = Prefs(context = applicationContext)
         if (prefs.isFirstLaunch ) {
-            DatabaseProviderWrap.noteDao.insert(
+            insertNoteUseCase(
                 Note(
                     0.toLong(),
-                    title = getString(R.string.tip),
-                    content = getString(R.string.welcome),
+                    title = getString( CommonStrings.tip),
+                    content = getString( CommonStrings.welcome),
                     color = 0,
                     pinned = false,
                 )
             )
-            DatabaseProviderWrap.noteDao.insert(
+            insertNoteUseCase(
                 Note(
                     0.toLong(),
-                    title = getString(R.string.tip),
-                    content = getString(R.string.welcome2),
+                    title = getString( CommonStrings.tip),
+                    content = getString( CommonStrings.welcome2),
                     color = 0,
                     pinned = false,
                 )
             )
-            DatabaseProviderWrap.noteDao.insert(
+            insertNoteUseCase(
                 Note(
                     0.toLong(),
-                    title = getString(R.string.tip),
-                    content = getString(R.string.welcome3),
+                    title = getString(CommonStrings.tip),
+                    content = getString( CommonStrings.welcome3),
                     color = 0,
                     pinned = true,
                 )

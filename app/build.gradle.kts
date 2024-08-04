@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     alias(libs.plugins.kotlinSerialization)
-
 }
 
 
@@ -15,8 +14,8 @@ android {
         applicationId = "com.dracul.notes"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.0"
+        versionCode = 7
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,8 +28,8 @@ android {
             isMinifyEnabled = true
         }
         debug {
-            isMinifyEnabled = true
-            isDebuggable = false
+            isMinifyEnabled = false
+            isDebuggable = true
         }
 
     }
@@ -55,6 +54,22 @@ android {
 }
 
 dependencies {
+    implementation(project(":components:notes"))
+    implementation(project(":common"))
+    implementation(project(":core"))
+    implementation(project(":feature-main"))
+
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.common)
+    implementation(project(":feature-edit"))
+    implementation(project(":core:database"))
+    ksp(libs.androidx.room.compiler)
+
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.datastore:datastore-preferences-core:1.1.1")
     implementation(libs.androidx.material.icons.extended)
@@ -63,11 +78,7 @@ dependencies {
     implementation(libs.decompose.jetbrains)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.decompose)
-    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
-    annotationProcessor(libs.androidx.room.compiler)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
