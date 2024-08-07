@@ -7,7 +7,8 @@ plugins {
 
 
 android {
-    namespace = "com.dracul.notes"
+    val packageName = "com.dracul.notes"
+    namespace = packageName
     compileSdk = 34
 
     defaultConfig {
@@ -30,8 +31,8 @@ android {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
+            applicationIdSuffix = ".debug"
         }
-
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -58,6 +59,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core"))
     implementation(project(":feature-main"))
+    implementation(project(":feature-reminder"))
 
 
     implementation(libs.androidx.room.runtime)

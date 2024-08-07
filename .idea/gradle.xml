@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/core/database" />
             <option value="$PROJECT_DIR$/feature-edit" />
             <option value="$PROJECT_DIR$/feature-main" />
+            <option value="$PROJECT_DIR$/feature-reminder" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

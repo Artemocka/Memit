@@ -23,7 +23,8 @@ import com.dracul.notes.domain.models.Note
 import com.dracul.notes.navigation.RootComponent
 import com.dracul.notes.components.Prefs
 import com.dracul.notes.ui.theme.NotesTheme
-import com.dracul.feature_main.MainScreen
+import com.dracul.feature_main.ui.screen.MainScreen
+import com.dracul.feature_reminder.worker.createNotificationChannel
 import com.dracul.notes.domain.usecase.InsertNoteUseCase
 import com.dracul.notes.viewmodels.ActivityViewModel
 import org.koin.core.component.KoinComponent
@@ -37,6 +38,8 @@ class MainActivity : ComponentActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityViewModel
+        createNotificationChannel(applicationContext)
+
         val prefs = Prefs(context = applicationContext)
         if (prefs.isFirstLaunch ) {
             insertNoteUseCase(

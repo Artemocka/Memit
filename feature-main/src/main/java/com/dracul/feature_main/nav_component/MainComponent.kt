@@ -5,10 +5,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.startActivity
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.arkivanov.decompose.ComponentContext
 import com.dracul.common.models.CircleColor
 import com.dracul.common.models.CircleColorList
 import com.dracul.feature_main.event.MainEvent
+import com.dracul.feature_reminder.worker.ReminderWorker
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCase
 import com.dracul.notes.domain.usecase.DeleteNoteUseCase
 import com.dracul.notes.domain.usecase.GetAllNotesUseCase
@@ -22,12 +26,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.TimeUnit
 
 class MainComponent(
     componentContext: ComponentContext,
     private val onEditNote: (id: Long?) -> Unit,
 ) : ComponentContext by componentContext, KoinComponent {
-    val deleteNoteUseCase by inject<DeleteNoteUseCase>()
     val deleteNoteByIdUseCase by inject<DeleteNoteByIdUseCase>()
     val getNoteByIdUseCase by inject<GetNoteByIdUseCase>()
     val getAllNotesUseCase by inject<GetAllNotesUseCase>()
@@ -41,6 +45,8 @@ class MainComponent(
     private var _colorsList: MutableState<List<CircleColor>> = mutableStateOf(emptyList())
     private var _showSearchBar = mutableStateOf(false)
     private var _searchQuery = MutableStateFlow("")
+    private var _showReminderDialog = mutableStateOf(false)
+    var showReminderDialog:State<Boolean> = _showReminderDialog
     var searchQuery = _searchQuery.asStateFlow()
     var showSearchBar: State<Boolean> = _showSearchBar
     var colorsList: State<List<CircleColor>> = _colorsList
@@ -135,7 +141,6 @@ class MainComponent(
             }
 
             MainEvent.HideBottomSheet -> {
-                selectedItemId = null
                 _showBottomSheet.value = false
             }
 
@@ -143,7 +148,6 @@ class MainComponent(
                 selectedItemId?.let {
                     onEditNote(it)
                 }
-                selectedItemId = null
             }
 
             is MainEvent.SetNoteColorModal -> {
@@ -164,6 +168,29 @@ class MainComponent(
                 _showSearchBar.value = !_showSearchBar.value
                 if (!_showSearchBar.value)
                     _searchQuery.value = ""
+            }
+
+            MainEvent.HideReminder -> {
+                _showReminderDialog.value = false
+            }
+            MainEvent.ShowReminder -> {
+                _showReminderDialog.value = true
+            }
+
+            is MainEvent.CreateReminder -> {
+                val note = selectedItemId?.let { getNoteByIdUseCase(it) }
+                val inputData = Data.Builder()
+                    .putString("MESSAGE", note?.content?.let { RichTextState().setHtml(it).annotatedString.text })
+                    .build()
+                val currentTimeInMillis = System.currentTimeMillis()
+
+
+                val reminderRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+                    .setInitialDelay(event.millis-currentTimeInMillis, TimeUnit.MILLISECONDS)
+                    .setInputData(inputData)
+                    .addTag("reminder")
+                    .build()
+                WorkManager.getInstance().enqueue(reminderRequest)
             }
         }
     }
