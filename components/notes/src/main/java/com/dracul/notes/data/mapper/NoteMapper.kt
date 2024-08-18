@@ -10,6 +10,7 @@ internal fun NoteEntity.toDomain(): Note = Note(
     content = content,
     color = color,
     pinned = pinned,
+    workerId = workerId
 )
 
 internal fun Note.toEntity(): NoteEntity =
@@ -19,4 +20,5 @@ internal fun Note.toEntity(): NoteEntity =
         content = content,
         color = color,
         pinned = pinned,
+        workerId = workerId,
     )

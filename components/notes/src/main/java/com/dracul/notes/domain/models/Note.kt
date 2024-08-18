@@ -11,4 +11,5 @@ data class Note(
     val content: String,
     val color: Int,
     val pinned: Boolean = false,
+    val workerId: String? = null,
 )

@@ -2,6 +2,7 @@ package com.dracul.database.notes
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity
 class NoteEntity (
@@ -11,4 +12,5 @@ class NoteEntity (
     val content: String,
     val color: Int,
     val pinned: Boolean = false,
+    val workerId:String?,
 )

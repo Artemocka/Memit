@@ -1,4 +1,4 @@
-package com.dracul.feature_reminder.worker
+package com.dracul.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
+import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.dracul.feature_main.nav_component.MainComponent
 import kotlinx.serialization.Serializable
 
@@ -28,15 +29,11 @@ class RootComponent(
         config: Configuration, context: ComponentContext
     ): Child {
         return when (config) {
-            is Configuration.MainScreen -> Child.MainScreen(
-                MainComponent(
-                    componentContext = context,
-                    onEditNote = { navigation.pushNew(Configuration.EditNote(it)) }
-                )
-            )
+            is Configuration.MainScreen -> Child.MainScreen(MainComponent(componentContext = context,
+                onEditNote = { navigation.pushNew(Configuration.EditNote(it)) }))
 
             is Configuration.EditNote -> Child.EditNote(
-                com.dracul.feature_edit.nav_component.EditNoteComponent(
+                EditNoteComponent(
                     id = config.id,
                     componentContext = context,
                     onGoBack = { navigation.pop() },
@@ -45,14 +42,13 @@ class RootComponent(
         }
     }
 
-    fun onBackClick() {
-        navigation.pop()
+    fun onDeepLink(initialItemId: Long) {
+        navigation.pushNew(Configuration.EditNote(id = initialItemId))
     }
-
 
     sealed class Child {
         data class MainScreen(val component: MainComponent) : Child()
-        data class EditNote(val component: com.dracul.feature_edit.nav_component.EditNoteComponent) : Child()
+        data class EditNote(val component: EditNoteComponent) : Child()
     }
 
     @Serializable

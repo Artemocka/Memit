@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":components:notes"))
     implementation(project(":common"))
     implementation(project(":core"))
+    implementation(project(":core:notification"))
     implementation(project(":feature-main"))
     implementation(project(":feature-reminder"))
 
@@ -69,6 +70,7 @@ dependencies {
     implementation(project(":core:database"))
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.koin.core)
     implementation(libs.koin.android)

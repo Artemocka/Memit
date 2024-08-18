@@ -19,13 +19,13 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stac
 import com.arkivanov.decompose.retainedComponent
 import com.dracul.common.aliases.CommonStrings
 import com.dracul.feature_edit.ui.EditNoteScreen
-import com.dracul.notes.domain.models.Note
-import com.dracul.notes.navigation.RootComponent
-import com.dracul.notes.components.Prefs
-import com.dracul.notes.ui.theme.NotesTheme
 import com.dracul.feature_main.ui.screen.MainScreen
-import com.dracul.feature_reminder.worker.createNotificationChannel
+import com.dracul.notification.createNotificationChannel
+import com.dracul.notes.components.Prefs
+import com.dracul.notes.domain.models.Note
 import com.dracul.notes.domain.usecase.InsertNoteUseCase
+import com.dracul.notes.navigation.RootComponent
+import com.dracul.notes.ui.theme.NotesTheme
 import com.dracul.notes.viewmodels.ActivityViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -40,22 +40,19 @@ class MainActivity : ComponentActivity(), KoinComponent {
         activityViewModel
         createNotificationChannel(applicationContext)
 
+        val noteId: Long? = intent?.let {
+            val id = it.getLongExtra("NOTE_ID", -1)
+            if (id == (-1).toLong()) null else id
+        }
+
+
         val prefs = Prefs(context = applicationContext)
-        if (prefs.isFirstLaunch ) {
+        if (prefs.isFirstLaunch) {
             insertNoteUseCase(
                 Note(
                     0.toLong(),
-                    title = getString( CommonStrings.tip),
-                    content = getString( CommonStrings.welcome),
-                    color = 0,
-                    pinned = false,
-                )
-            )
-            insertNoteUseCase(
-                Note(
-                    0.toLong(),
-                    title = getString( CommonStrings.tip),
-                    content = getString( CommonStrings.welcome2),
+                    title = getString(CommonStrings.tip),
+                    content = getString(CommonStrings.welcome),
                     color = 0,
                     pinned = false,
                 )
@@ -64,7 +61,16 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 Note(
                     0.toLong(),
                     title = getString(CommonStrings.tip),
-                    content = getString( CommonStrings.welcome3),
+                    content = getString(CommonStrings.welcome2),
+                    color = 0,
+                    pinned = false,
+                )
+            )
+            insertNoteUseCase(
+                Note(
+                    0.toLong(),
+                    title = getString(CommonStrings.tip),
+                    content = getString(CommonStrings.welcome3),
                     color = 0,
                     pinned = true,
                 )
@@ -73,6 +79,10 @@ class MainActivity : ComponentActivity(), KoinComponent {
         val root = retainedComponent {
             RootComponent(it)
         }
+        noteId?.let {
+            root.onDeepLink(it)
+        }
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
                 android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT

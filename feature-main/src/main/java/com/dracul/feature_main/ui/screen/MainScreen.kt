@@ -124,7 +124,6 @@ fun MainScreen(
             }, colorList = component.colorsList
             )
         }
-        log(showReminderDialog.toString())
         if (showReminderDialog){
             ReminderBottomSheet {
                 component.onEvent(MainEvent.HideReminder)

@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/components/notes" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/core/database" />
+            <option value="$PROJECT_DIR$/core/notification" />
             <option value="$PROJECT_DIR$/feature-edit" />
             <option value="$PROJECT_DIR$/feature-main" />
             <option value="$PROJECT_DIR$/feature-reminder" />

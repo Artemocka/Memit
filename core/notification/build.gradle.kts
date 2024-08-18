@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.dracul.feature_reminder"
+    namespace = "com.dracul.notification"
     compileSdk = 34
 
     defaultConfig {
@@ -33,10 +33,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.androidx.work.runtime.ktx)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

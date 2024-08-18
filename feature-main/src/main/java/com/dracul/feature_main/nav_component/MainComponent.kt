@@ -14,7 +14,6 @@ import com.dracul.common.models.CircleColorList
 import com.dracul.feature_main.event.MainEvent
 import com.dracul.feature_reminder.worker.ReminderWorker
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCase
-import com.dracul.notes.domain.usecase.DeleteNoteUseCase
 import com.dracul.notes.domain.usecase.GetAllNotesUseCase
 import com.dracul.notes.domain.usecase.GetNoteByIdUseCase
 import com.dracul.notes.domain.usecase.InsertNoteUseCase
@@ -178,12 +177,12 @@ class MainComponent(
             }
 
             is MainEvent.CreateReminder -> {
-                val note = selectedItemId?.let { getNoteByIdUseCase(it) }
+                val note = selectedItemId?.let { getNoteByIdUseCase(it) }!!
                 val inputData = Data.Builder()
-                    .putString("MESSAGE", note?.content?.let { RichTextState().setHtml(it).annotatedString.text })
+                    .putString("MESSAGE", note.content.let { RichTextState().setHtml(it).annotatedString.text })
+                    .putLong("NOTE_ID", note.id)
                     .build()
                 val currentTimeInMillis = System.currentTimeMillis()
-
 
                 val reminderRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
                     .setInitialDelay(event.millis-currentTimeInMillis, TimeUnit.MILLISECONDS)
