@@ -29,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dracul.common.aliases.CommonStrings
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -41,7 +40,9 @@ import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
+fun ReminderBottomSheetWithDelete(
+    onCreateReminder: (Calendar?) -> Unit, onDeleteReminder: () -> Unit
+) {
 
     val currentTime = Calendar.getInstance()
     val notificationPermission = rememberPermissionState(
@@ -141,7 +142,15 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
                     .padding(end = 12.dp, top = 4.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-
+                Button(onClick = {
+                    scope.launch {
+                        modalBottomSheetState.hide()
+                    }.invokeOnCompletion {
+                        onDeleteReminder()
+                    }
+                }) {
+                    Text(text = stringResource(id = CommonStrings.delete))
+                }
                 Button(onClick = {
                     if (!notificationPermission.status.isGranted) {
                         requestPermissionLauncher.launch(
@@ -155,7 +164,7 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
                         }
                     }
                 }) {
-                    Text(text = "Create")
+                    Text(text = stringResource(id = CommonStrings.create))
                 }
             }
         }
@@ -163,20 +172,5 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
 
 }
 
-
-@Preview
-@Composable
-fun ReminderBottomSheetPreview() {
-    ReminderBottomSheet({})
-}
-
-fun normalizeTime(hour: Int, minute: Int): String {
-    return when {
-        hour < 10 && minute < 10 -> "0${hour}:0${minute}"
-        hour < 10 -> "0${hour}:${minute}"
-        minute < 10 -> "${hour}:0${minute}"
-        else -> "${hour}:${minute}"
-    }
-}
 
 

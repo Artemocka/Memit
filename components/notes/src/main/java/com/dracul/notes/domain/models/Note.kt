@@ -12,4 +12,5 @@ data class Note(
     val color: Int,
     val pinned: Boolean = false,
     val workerId: String? = null,
+    val reminderTimeStamp: Long? = null,
 )

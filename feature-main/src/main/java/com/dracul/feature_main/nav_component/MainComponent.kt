@@ -3,7 +3,9 @@ package com.dracul.feature_main.nav_component
 import android.content.Intent
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat.startActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -11,6 +13,7 @@ import androidx.work.WorkManager
 import com.arkivanov.decompose.ComponentContext
 import com.dracul.common.models.CircleColor
 import com.dracul.common.models.CircleColorList
+import com.dracul.common.utills.poop
 import com.dracul.feature_main.event.MainEvent
 import com.dracul.feature_reminder.worker.ReminderWorker
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCase
@@ -19,12 +22,14 @@ import com.dracul.notes.domain.usecase.GetNoteByIdUseCase
 import com.dracul.notes.domain.usecase.InsertNoteUseCase
 import com.dracul.notes.domain.usecase.UpdateNoteUseCase
 import com.dracul.notes.domain.usecase.UpdatePinnedNoteByIdUseCase
+import com.dracul.notes.domain.usecase.UpdateWorkerByIdUseCase
 import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class MainComponent(
@@ -37,6 +42,7 @@ class MainComponent(
     val insertNotesUseCase by inject<InsertNoteUseCase>()
     val updateNotesUseCase by inject<UpdateNoteUseCase>()
     val updatePinnedNoteByIdUseCase by inject<UpdatePinnedNoteByIdUseCase>()
+    val updateWorkerByIdUseCase by inject<UpdateWorkerByIdUseCase>()
 
     private var circleColorList: CircleColorList = CircleColorList()
     private val _showBottomSheet = mutableStateOf(false)
@@ -172,7 +178,7 @@ class MainComponent(
             MainEvent.HideReminder -> {
                 _showReminderDialog.value = false
             }
-            MainEvent.ShowReminder -> {
+            is MainEvent.ShowReminder -> {
                 _showReminderDialog.value = true
             }
 
@@ -189,8 +195,11 @@ class MainComponent(
                     .setInputData(inputData)
                     .addTag("reminder")
                     .build()
+
+                updateWorkerByIdUseCase(note.id, reminderRequest.id.toString(), event.millis)
                 WorkManager.getInstance().enqueue(reminderRequest)
             }
+
         }
     }
 

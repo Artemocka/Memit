@@ -10,15 +10,16 @@ internal fun NoteEntity.toDomain(): Note = Note(
     content = content,
     color = color,
     pinned = pinned,
-    workerId = workerId
+    workerId = workerId ,
+    reminderTimeStamp = reminderTimeStamp
 )
 
-internal fun Note.toEntity(): NoteEntity =
-    NoteEntity(
-        id = id,
-        title = title,
-        content = content,
-        color = color,
-        pinned = pinned,
-        workerId = workerId,
-    )
+internal fun Note.toEntity(): NoteEntity = NoteEntity(
+    id = id,
+    title = title,
+    content = content,
+    color = color,
+    pinned = pinned,
+    workerId = workerId,
+    reminderTimeStamp = reminderTimeStamp
+)

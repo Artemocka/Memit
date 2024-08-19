@@ -13,4 +13,5 @@ class NoteEntity (
     val color: Int,
     val pinned: Boolean = false,
     val workerId:String?,
+    val reminderTimeStamp:Long?,
 )

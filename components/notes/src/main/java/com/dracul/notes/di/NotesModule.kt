@@ -7,6 +7,7 @@ import com.dracul.notes.data.repository.GetNoteByIdImpl
 import com.dracul.notes.data.repository.InsertNoteImpl
 import com.dracul.notes.data.repository.UpdateNoteImpl
 import com.dracul.notes.data.repository.UpdatePinnedNoteByIdImpl
+import com.dracul.notes.data.repository.UpdateWorkerByIdImpl
 import com.dracul.notes.domain.repository.DeleteNoteByIdRepo
 import com.dracul.notes.domain.repository.DeleteNoteRepo
 import com.dracul.notes.domain.repository.GetAllNotesRepo
@@ -14,6 +15,7 @@ import com.dracul.notes.domain.repository.GetNoteByIdRepo
 import com.dracul.notes.domain.repository.InsertNoteRepo
 import com.dracul.notes.domain.repository.UpdateNoteRepo
 import com.dracul.notes.domain.repository.UpdatePinnedNoteByIdRepo
+import com.dracul.notes.domain.repository.UpdateWorkerByIdRepo
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCase
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCaseImpl
 import com.dracul.notes.domain.usecase.DeleteNoteUseCase
@@ -28,12 +30,17 @@ import com.dracul.notes.domain.usecase.UpdateNoteUseCase
 import com.dracul.notes.domain.usecase.UpdateNoteUseCaseImpl
 import com.dracul.notes.domain.usecase.UpdatePinnedNoteByIdUseCase
 import com.dracul.notes.domain.usecase.UpdatePinnedNoteByIdUseCaseImpl
+import com.dracul.notes.domain.usecase.UpdateWorkerByIdUseCase
+import com.dracul.notes.domain.usecase.UpdateWorkerByIdUseCaseImpl
 import org.koin.dsl.module
 
 val notesModule = module {
     //repository
     single<GetNoteByIdRepo> {
         GetNoteByIdImpl()
+    }
+    single<UpdateWorkerByIdRepo> {
+        UpdateWorkerByIdImpl()
     }
     single<GetAllNotesRepo> {
         GetAllNotesImpl()
@@ -53,7 +60,11 @@ val notesModule = module {
     single<DeleteNoteByIdRepo> {
         DeleteNoteByIdImpl()
     }
+
     //usecase
+    single<UpdateWorkerByIdUseCase> {
+        UpdateWorkerByIdUseCaseImpl(get())
+    }
     single<GetNoteByIdUseCase> {
         GetNoteByIdUseCaseImpl(get())
     }

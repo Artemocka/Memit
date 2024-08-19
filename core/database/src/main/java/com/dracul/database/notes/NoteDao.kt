@@ -1,12 +1,11 @@
 package com.dracul.database.notes
 
+
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-
-
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -27,8 +26,8 @@ interface NoteDao {
     @Query("UPDATE NoteEntity SET pinned = :pinned  WHERE id = :id")
     fun updatePinnedById(id: Long, pinned: Boolean)
 
-    @Query("UPDATE NoteEntity SET workerId = :workerId  WHERE id = :id")
-    fun updateWorkerIdById(id:Long, workerId:String?)
+    @Query("UPDATE NoteEntity SET workerId = :workerId , reminderTimeStamp = :reminderTimeStamp WHERE id = :id")
+    fun updateWorkerById(id: Long, workerId: String?, reminderTimeStamp: Long?)
 
     @Delete
     fun delete(item: NoteEntity)

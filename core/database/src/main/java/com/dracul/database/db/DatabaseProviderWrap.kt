@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.dracul.database.migrations.MIGRATION_1_2
 import com.dracul.database.migrations.MIGRATION_2_3
+import com.dracul.database.migrations.MIGRATION_3_4
+import com.dracul.database.migrations.MIGRATION_4_5
 import com.dracul.database.notes.NoteDao
 
 object DatabaseProviderWrap {
@@ -20,7 +22,7 @@ object DatabaseProviderWrap {
     fun createDao(context: Context) {
         provider = Room.databaseBuilder(context, DatabaseProvider::class.java, "notes")
             .allowMainThreadQueries()
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
 }
