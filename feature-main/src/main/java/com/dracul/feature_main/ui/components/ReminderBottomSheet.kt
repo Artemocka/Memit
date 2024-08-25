@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -41,7 +43,9 @@ import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
+fun ReminderBottomSheet(
+    onDismissRequest: () -> Unit,
+    onCreateReminder: (Calendar?) -> Unit,) {
 
     val currentTime = Calendar.getInstance()
     val notificationPermission = rememberPermissionState(
@@ -111,7 +115,7 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
         modifier = Modifier.windowInsetsPadding(WindowInsets(bottom = 0)),
         sheetState = modalBottomSheetState,
         onDismissRequest = {
-            onCreateReminder(null)
+            onDismissRequest()
         },
         windowInsets = WindowInsets(bottom = 0),
     ) {
@@ -138,7 +142,7 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 12.dp, top = 4.dp),
+                    .padding(end = 12.dp, top = 4.dp).navigationBarsPadding()   ,
                 horizontalArrangement = Arrangement.End
             ) {
 
@@ -154,7 +158,9 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
                             onCreateReminder(date)
                         }
                     }
-                }) {
+                },
+                    shape = RoundedCornerShape(16.dp)
+                    ) {
                     Text(text = "Create")
                 }
             }
@@ -167,7 +173,7 @@ fun ReminderBottomSheet(onCreateReminder: (Calendar?) -> Unit,) {
 @Preview
 @Composable
 fun ReminderBottomSheetPreview() {
-    ReminderBottomSheet({})
+    ReminderBottomSheet({},{})
 }
 
 fun normalizeTime(hour: Int, minute: Int): String {

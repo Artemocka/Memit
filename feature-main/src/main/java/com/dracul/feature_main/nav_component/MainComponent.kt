@@ -51,7 +51,9 @@ class MainComponent(
     private var _showSearchBar = mutableStateOf(false)
     private var _searchQuery = MutableStateFlow("")
     private var _showReminderDialog = mutableStateOf(false)
+    private var _showReminderDialogWithDelete = mutableStateOf(false)
     var showReminderDialog:State<Boolean> = _showReminderDialog
+    var showReminderDialogWithDelete:State<Boolean> = _showReminderDialogWithDelete
     var searchQuery = _searchQuery.asStateFlow()
     var showSearchBar: State<Boolean> = _showSearchBar
     var colorsList: State<List<CircleColor>> = _colorsList
@@ -183,6 +185,8 @@ class MainComponent(
             }
 
             is MainEvent.CreateReminder -> {
+                _showReminderDialog.value = false
+                _showReminderDialogWithDelete.value = false
                 val note = selectedItemId?.let { getNoteByIdUseCase(it) }!!
                 val inputData = Data.Builder()
                     .putString("MESSAGE", note.content.let { RichTextState().setHtml(it).annotatedString.text })
@@ -200,7 +204,19 @@ class MainComponent(
                 WorkManager.getInstance().enqueue(reminderRequest)
             }
 
+            MainEvent.HideReminderWithDelete -> _showReminderDialogWithDelete.value = false
+            is MainEvent.ShowReminderWithDelete -> {
+                selectedItemId = event.id
+                _showReminderDialogWithDelete.value = true
+            }
+            is MainEvent.DeleteReminder->{
+                selectedItemId?.let {
+                    val tempNote = getNoteByIdUseCase(it)
+                    WorkManager.getInstance().cancelWorkById(UUID.fromString(tempNote.workerId))
+                    updateWorkerByIdUseCase(tempNote.id, null, null)
+                }
+                _showReminderDialogWithDelete.value = false
+            }
         }
     }
-
 }

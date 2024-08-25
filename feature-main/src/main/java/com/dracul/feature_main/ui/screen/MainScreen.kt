@@ -33,6 +33,7 @@ import com.dracul.feature_main.nav_component.MainComponent
 import com.dracul.feature_main.ui.components.ActionsBottomSheet
 import com.dracul.feature_main.ui.components.ItemGrid
 import com.dracul.feature_main.ui.components.ReminderBottomSheet
+import com.dracul.feature_main.ui.components.ReminderBottomSheetWithDelete
 import com.dracul.feature_main.ui.components.TopAppBarWithSearch
 
 
@@ -57,7 +58,7 @@ fun MainScreen(
     }
     val reminderClickLambda = remember<(id: Long) -> Unit> {
         {
-            component.onEvent(MainEvent.ShowReminder)
+            component.onEvent(MainEvent.ShowReminderWithDelete(it))
         }
     }
     val notes = component.notes.collectAsStateWithLifecycle(
@@ -95,12 +96,25 @@ fun MainScreen(
             )
         }
         if (showReminderDialog) {
-            ReminderBottomSheet(){
+            ReminderBottomSheet(onDismissRequest = {
+                component.onEvent(MainEvent.HideReminder)
+            }){
                 it?.let {
                     component.onEvent(MainEvent.CreateReminder(it.timeInMillis))
                 }
             }
         }
+
+        if (component.showReminderDialogWithDelete.value) {
+            ReminderBottomSheetWithDelete(onDismissRequest = {
+                component.onEvent(MainEvent.HideReminderWithDelete)
+            }, onCreateReminder = {
+                    component.onEvent(MainEvent.CreateReminder(it.timeInMillis))
+            }){
+                component.onEvent(MainEvent.DeleteReminder)
+            }
+        }
+
 
         LazyVerticalStaggeredGrid(
             modifier = Modifier.padding(horizontal = 8.dp),

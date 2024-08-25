@@ -9,13 +9,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -41,7 +46,8 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ReminderBottomSheetWithDelete(
-    onCreateReminder: (Calendar?) -> Unit, onDeleteReminder: () -> Unit
+    onDismissRequest: () -> Unit,
+    onCreateReminder: (Calendar) -> Unit, onDeleteReminder: () -> Unit
 ) {
 
     val currentTime = Calendar.getInstance()
@@ -112,7 +118,7 @@ fun ReminderBottomSheetWithDelete(
         modifier = Modifier.windowInsetsPadding(WindowInsets(bottom = 0)),
         sheetState = modalBottomSheetState,
         onDismissRequest = {
-            onCreateReminder(null)
+            onDismissRequest()
         },
         windowInsets = WindowInsets(bottom = 0),
     ) {
@@ -139,16 +145,27 @@ fun ReminderBottomSheetWithDelete(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 12.dp, top = 4.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(onClick = {
-                    scope.launch {
-                        modalBottomSheetState.hide()
-                    }.invokeOnCompletion {
-                        onDeleteReminder()
-                    }
-                }) {
+                    .padding(end = 12.dp, top = 4.dp)
+                    .navigationBarsPadding(),
+                horizontalArrangement = Arrangement.End,
+
+                ) {
+                Button(
+                    modifier = Modifier.padding(end = 8.dp),
+                    onClick = {
+                        scope.launch {
+                            modalBottomSheetState.hide()
+                        }.invokeOnCompletion {
+                            onDeleteReminder()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+
+                ) {
                     Text(text = stringResource(id = CommonStrings.delete))
                 }
                 Button(onClick = {
@@ -163,7 +180,9 @@ fun ReminderBottomSheetWithDelete(
                             onCreateReminder(date)
                         }
                     }
-                }) {
+                },
+                    shape = RoundedCornerShape(16.dp)
+                    ) {
                     Text(text = stringResource(id = CommonStrings.create))
                 }
             }

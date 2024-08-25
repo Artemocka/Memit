@@ -20,4 +20,7 @@ sealed interface MainEvent {
     data object CreateNote : MainEvent
     data object ShowReminder : MainEvent
     data object HideReminder : MainEvent
+    data class ShowReminderWithDelete(val id: Long) : MainEvent
+    data object HideReminderWithDelete : MainEvent
+    data object DeleteReminder : MainEvent
 }

@@ -86,11 +86,11 @@ fun ItemGrid(
                             .padding(end = 4.dp)
                             .wrapContentWidth()
                             .height(21.dp)
-                            .clip(RoundedCornerShape(32.dp))
+                            .clip(RoundedCornerShape(16.dp))
                             .border(
                                 BorderStroke(
                                     1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant
-                                ), RoundedCornerShape(32.dp)
+                                ), RoundedCornerShape(16.dp)
                             )
                             .clickable {
                                 onReminderClick(item.id)
