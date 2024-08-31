@@ -91,7 +91,7 @@ fun FormatButtons(
             IconButton(
                 imageVector = Icons.AutoMirrored.Filled.Redo,
                 color = color,
-                enabled = component.isHasNext.value
+                enabled = component.isHasNext.value,
             ) {
                 component.onEvent(EditNoteEvent.Redo)
             }
@@ -201,8 +201,10 @@ fun IconButton(
     OutlinedIconButton(
         onClick = onClick,
         colors = IconButtonDefaults.iconButtonColors().copy(
-            containerColor = getColor(id = color),
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            contentColor = if (enabled) MaterialTheme.colorScheme.onSurface
+            else getColor(
+                id = color
+            ),
         ),
         shape = RoundedCornerShape(32),
         border = BorderStroke(0.dp, color = Color.Transparent),

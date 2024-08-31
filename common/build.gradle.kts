@@ -22,9 +22,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     buildFeatures.compose = true
     compileOptions {
@@ -42,12 +43,10 @@ dependencies {
     implementation(libs.androidx.room.common)
     ksp(libs.androidx.room.compiler)
     implementation(platform(libs.androidx.compose.bom))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.runtime.android)
-
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.material3.android)
     testImplementation(libs.junit)
