@@ -7,6 +7,6 @@ import com.dracul.notes.data.mapper.toEntity
 
 class DeleteNoteImpl : DeleteNoteRepo {
     override fun invoke(item: Note) {
-        com.dracul.database.db.DatabaseProviderWrap.noteDao.delete(item.toEntity())
+        DatabaseProviderWrap.noteDao.delete(item.toEntity())
     }
 }

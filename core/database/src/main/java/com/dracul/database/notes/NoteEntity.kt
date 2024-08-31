@@ -2,7 +2,6 @@ package com.dracul.database.notes
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
 
 @Entity
 class NoteEntity (

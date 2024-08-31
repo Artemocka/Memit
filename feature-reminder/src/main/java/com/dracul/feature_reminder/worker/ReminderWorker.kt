@@ -46,6 +46,7 @@ class ReminderWorker(context: Context, workerParams: WorkerParameters) :
             .setContentText(message).setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
+
         with(NotificationManagerCompat.from(applicationContext)) {
             if (ActivityCompat.checkSelfPermission(
                     applicationContext, Manifest.permission.POST_NOTIFICATIONS

@@ -1,7 +1,6 @@
 package com.dracul.feature_main.ui.screen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
@@ -76,8 +75,7 @@ fun MainScreen(
             Icon(imageVector = Icons.Default.Add, contentDescription = "add")
         }
     }, topBar = {
-        TopAppBarWithSearch(
-            showSearchBox = component.showSearchBar.value,
+        TopAppBarWithSearch(showSearchBox = component.showSearchBar.value,
             text = text.value,
             onEdit = {
                 component.onEvent(SetSearchQuery(it))
@@ -98,7 +96,7 @@ fun MainScreen(
         if (showReminderDialog) {
             ReminderBottomSheet(onDismissRequest = {
                 component.onEvent(MainEvent.HideReminder)
-            }){
+            }) {
                 it?.let {
                     component.onEvent(MainEvent.CreateReminder(it.timeInMillis))
                 }
@@ -109,8 +107,8 @@ fun MainScreen(
             ReminderBottomSheetWithDelete(onDismissRequest = {
                 component.onEvent(MainEvent.HideReminderWithDelete)
             }, onCreateReminder = {
-                    component.onEvent(MainEvent.CreateReminder(it.timeInMillis))
-            }){
+                component.onEvent(MainEvent.CreateReminder(it.timeInMillis))
+            }) {
                 component.onEvent(MainEvent.DeleteReminder)
             }
         }
@@ -138,9 +136,5 @@ fun MainScreen(
     }
 }
 
-
-private fun log(msg: String) {
-    Log.e(null, msg)
-}
 
 

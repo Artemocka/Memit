@@ -7,6 +7,6 @@ import com.dracul.notes.data.mapper.toDomain
 
 class GetNoteByIdImpl: GetNoteByIdRepo {
     override fun invoke(id: Long): Note {
-        return com.dracul.database.db.DatabaseProviderWrap.noteDao.getById(id).toDomain()
+        return DatabaseProviderWrap.noteDao.getById(id).toDomain()
     }
 }

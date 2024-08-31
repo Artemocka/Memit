@@ -9,6 +9,6 @@ import kotlinx.coroutines.flow.map
 
 class GetAllNotesImpl:GetAllNotesRepo {
     override fun invoke(): Flow<List<Note>> {
-        return com.dracul.database.db.DatabaseProviderWrap.noteDao.getAll().map { it -> it.map { it.toDomain() } }
+        return DatabaseProviderWrap.noteDao.getAll().map { it -> it.map { it.toDomain() } }
     }
 }

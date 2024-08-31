@@ -3,9 +3,7 @@ package com.dracul.feature_main.nav_component
 import android.content.Intent
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat.startActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -13,7 +11,6 @@ import androidx.work.WorkManager
 import com.arkivanov.decompose.ComponentContext
 import com.dracul.common.models.CircleColor
 import com.dracul.common.models.CircleColorList
-import com.dracul.common.utills.poop
 import com.dracul.feature_main.event.MainEvent
 import com.dracul.feature_reminder.worker.ReminderWorker
 import com.dracul.notes.domain.usecase.DeleteNoteByIdUseCase
