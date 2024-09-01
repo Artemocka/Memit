@@ -217,10 +217,10 @@ fun CircleColorItem(
     val color = getColor(id = item.color)
     AnimatedContent(targetState = item.selected, transitionSpec = {
         scaleIn(
-            tween(200, easing = EaseIn), initialScale = 0.95f
-        ) + fadeIn(initialAlpha = 0.9f) togetherWith scaleOut(
-            tween(200, easing = EaseOut), targetScale = 0.85f
-        ) + fadeOut(targetAlpha = 0.9f)
+            tween(300, easing = EaseIn), initialScale = 0.6f
+        ) togetherWith scaleOut(
+            tween(300, easing = EaseOut), targetScale = 0.6f
+        )
     }) {
         if (it) {
             Image(painter = painterResource(id = CommonDrawables.ic_selected_circle),

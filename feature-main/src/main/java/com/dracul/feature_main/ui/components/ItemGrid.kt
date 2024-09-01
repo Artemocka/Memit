@@ -1,5 +1,8 @@
 package com.dracul.feature_main.ui.components
 
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -27,6 +30,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +63,14 @@ fun ItemGrid(
     item.reminderTimeStamp?.let {
         calendar.timeInMillis = it
     }
+    val color = getColor(id = item.color)
+    val animatedColor = remember { Animatable(color) }
+
+
+
+    LaunchedEffect(color) {
+        animatedColor.animateTo(color, animationSpec = tween(300, easing = EaseInOutCubic))
+    }
     Card(
         modifier = modifier
             .fillMaxSize()
@@ -64,7 +78,7 @@ fun ItemGrid(
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onClick = { onItemClick(item.id) },
                 onLongClick = { onItemLongClick(item.id) }),
-        colors = CardDefaults.cardColors().copy(containerColor = getColor(item.color)),
+        colors = CardDefaults.cardColors().copy(containerColor = animatedColor.value),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
