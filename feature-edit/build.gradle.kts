@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.animation.android)
     implementation(libs.androidx.material3.android)
     implementation(project(":feature-main"))
+    implementation(libs.androidx.ui.tooling.preview.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

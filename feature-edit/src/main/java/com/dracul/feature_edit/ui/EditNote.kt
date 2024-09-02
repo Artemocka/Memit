@@ -126,6 +126,7 @@ fun EditNoteScreen(
                 .padding(horizontal = 8.dp)
                 .navigationBarsPadding(),
         ) {
+//            ImageRow(modifier = Modifier.fillMaxWidth(),)
             OutlinedTextField(
                 placeholder = { Text(text = stringResource(CommonStrings.title_optional)) },
                 value = title.value,
