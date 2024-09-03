@@ -35,6 +35,8 @@ android {
 dependencies {
     implementation(project(":core:database"))
     implementation(libs.androidx.core.ktx)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.runtime.android)

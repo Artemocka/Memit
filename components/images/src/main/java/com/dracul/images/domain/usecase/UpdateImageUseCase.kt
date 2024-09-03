@@ -1,15 +1,16 @@
 package com.dracul.images.domain.usecase
 
 import com.dracul.images.domain.models.Image
+import com.dracul.images.domain.repository.UpdateImageRepo
 
 interface UpdateImageUseCase {
     operator fun invoke(image: Image)
 }
 
 class UpdateImageImpl(
-//    val repo:DeleteNoteByIdRepo
+    val repo: UpdateImageRepo
 ) : UpdateImageUseCase {
     override fun invoke(image: Image) {
-//        repo(id)
+        repo(image)
     }
 }

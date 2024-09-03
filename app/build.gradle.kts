@@ -56,6 +56,7 @@ android {
 
 dependencies {
     implementation(project(":components:notes"))
+    implementation(project(":components:images"))
     implementation(project(":common"))
     implementation(project(":core"))
     implementation(project(":core:notification"))
