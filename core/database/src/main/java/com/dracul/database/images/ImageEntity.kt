@@ -1,5 +1,6 @@
 package com.dracul.database.images
 
+import android.graphics.Bitmap
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,7 +9,7 @@ data class ImageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val parentId: Long,
-    val bitmap: ByteArray
+    val bitmap: Bitmap
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

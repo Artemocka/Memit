@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -76,11 +77,21 @@ fun FormatButtons(
             )
         ) + fadeOut(tween(200))
     ) {
+
+
         Row(
             modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
                 .imePadding()
                 .padding(horizontal = 2.dp)
         ) {
+            IconButton(
+                imageVector = Icons.Filled.Image,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.AddPhoto)
+            }
             IconButton(
                 imageVector = Icons.AutoMirrored.Filled.Undo,
                 color = color,
@@ -95,69 +106,62 @@ fun FormatButtons(
             ) {
                 component.onEvent(EditNoteEvent.Redo)
             }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(scrollState)
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_bold),
+                expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
+                color = color,
             ) {
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_bold),
-                    expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetBold)
-                }
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_italic),
-                    expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetItalic)
-                }
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_linethrough),
-                    expr = lineThroughExpr,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetLinethrough)
-                }
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_underline),
-                    expr = underlineExpr,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetUnderline)
-                }
+                component.onEvent(EditNoteEvent.SetBold)
+            }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_italic),
+                expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetItalic)
+            }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_linethrough),
+                expr = lineThroughExpr,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetLinethrough)
+            }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_underline),
+                expr = underlineExpr,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetUnderline)
+            }
 
 
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_align_left),
-                    expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetAlignStart)
-                }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_align_left),
+                expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetAlignStart)
+            }
 
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_align_center),
-                    expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetAlignCenter)
-                }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_align_center),
+                expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetAlignCenter)
+            }
 
-                IconButton(
-                    painter = painterResource(id = CommonDrawables.ic_align_right),
-                    expr = content.currentParagraphStyle.textAlign == TextAlign.End,
-                    color = color,
-                ) {
-                    component.onEvent(EditNoteEvent.SetAlignEnd)
-                }
+            IconButton(
+                painter = painterResource(id = CommonDrawables.ic_align_right),
+                expr = content.currentParagraphStyle.textAlign == TextAlign.End,
+                color = color,
+            ) {
+                component.onEvent(EditNoteEvent.SetAlignEnd)
+            }
 
-                IconButton(imageVector = Icons.Filled.Clear, color = color) {
-                    component.onEvent(EditNoteEvent.ClearALl)
-                }
+            IconButton(imageVector = Icons.Filled.Clear, color = color) {
+                component.onEvent(EditNoteEvent.ClearALl)
             }
         }
     }

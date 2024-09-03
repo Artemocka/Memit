@@ -156,6 +156,8 @@ class EditNoteComponent(
                 history.prev()
                 content.value = history.current.value.value.copy()
             }
+
+            EditNoteEvent.AddPhoto -> TODO()
         }
     }
 
