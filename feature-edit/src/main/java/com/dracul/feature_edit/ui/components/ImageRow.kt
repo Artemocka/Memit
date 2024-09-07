@@ -1,5 +1,6 @@
 package com.dracul.feature_edit.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -30,15 +33,16 @@ import coil.size.Size
 import com.dracul.common.utills.noRippleClickable
 import com.dracul.images.domain.models.Image
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageRow(
-    modifier: Modifier = Modifier,
-    images: List<Image>,
-    onDelete: (imageId: Image) -> Unit
+    modifier: Modifier = Modifier, images: List<Image>, onDelete: (imageId: Image) -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val lazyListState = rememberLazyListState()
+    val density = LocalDensity.current
+
     LazyRow(
         modifier = modifier
             .fillMaxWidth()
@@ -47,15 +51,16 @@ fun ImageRow(
         state = lazyListState,
         userScrollEnabled = true,
     ) {
-        items(images.size) {
+        itemsIndexed(items = images, key = { _, item ->
+            item.id
+        }) { i, item ->
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL)
-                    .build()
+                model = ImageRequest.Builder(context).data(item.uri).size(Size.ORIGINAL).build()
             )
             Box(
-                modifier = Modifier
+                modifier = Modifier.animateItemPlacement()
                     .then(
-                        when (it) {
+                        when (i) {
                             0 -> Modifier.padding(start = 16.dp)
                             images.lastIndex -> Modifier.padding(end = 16.dp)
                             else -> Modifier.padding()
@@ -78,7 +83,7 @@ fun ImageRow(
                     modifier = Modifier
                         .padding(2.dp)
                         .noRippleClickable {
-                            onDelete(images[it])
+                            onDelete(item)
                         },
                     colorFilter = ColorFilter.tint(
                         Color.White

@@ -5,8 +5,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -40,9 +47,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -55,7 +64,15 @@ import com.dracul.common.utills.copyUriToInternalStorage
 import com.dracul.common.utills.getBlendedColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.getRandomString
-import com.dracul.feature_edit.event.EditNoteAction.*
+import com.dracul.feature_edit.event.EditNoteAction.Back
+import com.dracul.feature_edit.event.EditNoteAction.DeleteImage
+import com.dracul.feature_edit.event.EditNoteAction.DeleteNote
+import com.dracul.feature_edit.event.EditNoteAction.HideColorPicker
+import com.dracul.feature_edit.event.EditNoteAction.SelectImage
+import com.dracul.feature_edit.event.EditNoteAction.SetColor
+import com.dracul.feature_edit.event.EditNoteAction.SetStarred
+import com.dracul.feature_edit.event.EditNoteAction.ShowColorPicker
+import com.dracul.feature_edit.event.EditNoteAction.UpdateTitle
 import com.dracul.feature_edit.event.EditNoteEvent
 import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.dracul.feature_edit.ui.components.ColorPickerDialog
@@ -84,8 +101,8 @@ fun EditNoteScreen(
     val images by component.images.collectAsState(listOf())
     val coroutineScope = rememberCoroutineScope()
 
+    val density = LocalDensity.current
 
-    // Create an activity result launcher for picking visual media (images in this case)
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             uri?.let {
@@ -101,7 +118,6 @@ fun EditNoteScreen(
                 }
             }
         }
-
     LaunchedEffect(Unit) {
         events.collect {
             when (it) {
@@ -111,8 +127,6 @@ fun EditNoteScreen(
             }
         }
     }
-
-
     LaunchedEffect(color) {
         animatedColor.animateTo(color, animationSpec = tween(500, easing = EaseInOutCubic))
     }
@@ -152,14 +166,13 @@ fun EditNoteScreen(
             })
         },
     ) { padding ->
-
         if (component.showColorDialog.value) {
-            ColorPickerDialog(currentColor = colorId,
+            ColorPickerDialog(
+                currentColor = colorId,
                 onDismiss = { component.onEvent(HideColorPicker) }) {
                 component.onEvent(SetColor(it))
             }
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -219,7 +232,13 @@ fun EditNoteScreen(
                     capitalization = KeyboardCapitalization.Sentences,
                 ),
             )
-            if (images.isNotEmpty()){
+            AnimatedVisibility(visible = images.isNotEmpty(), enter = slideInVertically {
+                with(density) { -40.dp.roundToPx() }
+            } + expandVertically(
+                expandFrom = Alignment.Top
+            ) + fadeIn(
+                initialAlpha = 0.3f
+            ), exit = slideOutVertically() + shrinkVertically() + fadeOut()) {
                 ResizableContainer(animatedColor.value) {
                     ImageRow(modifier = Modifier.fillMaxWidth(), images = images) {
                         component.onEvent(DeleteImage(it))
