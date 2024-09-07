@@ -104,18 +104,20 @@ fun EditNoteScreen(
     val density = LocalDensity.current
 
     val pickMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            uri?.let {
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
+            uris.let {
                 // Grant read URI permission to access the selected URI
-                val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                context.contentResolver.takePersistableUriPermission(uri, flag)
-                coroutineScope.launch(Dispatchers.IO) {
-                    val result = copyUriToInternalStorage(context, uri, getRandomString(8))
+              for(uri in uris){
+                  val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                  context.contentResolver.takePersistableUriPermission(uri, flag)
+                  coroutineScope.launch(Dispatchers.IO) {
+                      val result = copyUriToInternalStorage(context, uri, getRandomString(8))
 
-                    result?.let {
-                        component.onEvent(SelectImage(it))
-                    }
-                }
+                      result?.let {
+                          component.onEvent(SelectImage(it))
+                      }
+                  }
+              }
             }
         }
     LaunchedEffect(Unit) {
