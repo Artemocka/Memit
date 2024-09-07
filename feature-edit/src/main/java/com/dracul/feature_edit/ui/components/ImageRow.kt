@@ -4,26 +4,38 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.dracul.common.utills.noRippleClickable
 import com.dracul.images.domain.models.Image
 
 @Composable
-fun ImageRow(modifier: Modifier = Modifier, images: List<Image>) {
+fun ImageRow(
+    modifier: Modifier = Modifier,
+    images: List<Image>,
+    onDelete: (imageId: Image) -> Unit
+) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val lazyListState = rememberLazyListState()
@@ -37,14 +49,10 @@ fun ImageRow(modifier: Modifier = Modifier, images: List<Image>) {
     ) {
         items(images.size) {
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context)
-                    .data(images[it].uri)
-                    .size(Size.ORIGINAL)
+                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL)
                     .build()
             )
-            Image(
-                painter = painter,
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .then(
                         when (it) {
@@ -53,10 +61,30 @@ fun ImageRow(modifier: Modifier = Modifier, images: List<Image>) {
                             else -> Modifier.padding()
                         }
                     )
-                    .size(88.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop,
-            )
+                    .wrapContentSize(), contentAlignment = Alignment.TopEnd
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(88.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop,
+                )
+                Image(
+                    Icons.Filled.Cancel,
+                    null,
+                    alpha = 0.5f,
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .noRippleClickable {
+                            onDelete(images[it])
+                        },
+                    colorFilter = ColorFilter.tint(
+                        Color.White
+                    )
+                )
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.dracul.feature_edit.event
 
 import android.net.Uri
+import com.dracul.images.domain.models.Image
 
 
 sealed interface EditNoteAction {
@@ -22,6 +23,7 @@ sealed interface EditNoteAction {
     data object Undo : EditNoteAction
     data object Redo : EditNoteAction
     data object AddImage : EditNoteAction
+    data class DeleteImage(val image: Image) : EditNoteAction
     data class SelectImage(val uri: Uri) : EditNoteAction
 }
 

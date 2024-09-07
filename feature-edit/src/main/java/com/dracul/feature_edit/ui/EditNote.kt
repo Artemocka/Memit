@@ -34,7 +34,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,14 +55,7 @@ import com.dracul.common.utills.copyUriToInternalStorage
 import com.dracul.common.utills.getBlendedColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.getRandomString
-import com.dracul.feature_edit.event.EditNoteAction
-import com.dracul.feature_edit.event.EditNoteAction.Back
-import com.dracul.feature_edit.event.EditNoteAction.DeleteNote
-import com.dracul.feature_edit.event.EditNoteAction.HideColorPicker
-import com.dracul.feature_edit.event.EditNoteAction.SetColor
-import com.dracul.feature_edit.event.EditNoteAction.SetStarred
-import com.dracul.feature_edit.event.EditNoteAction.ShowColorPicker
-import com.dracul.feature_edit.event.EditNoteAction.UpdateTitle
+import com.dracul.feature_edit.event.EditNoteAction.*
 import com.dracul.feature_edit.event.EditNoteEvent
 import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.dracul.feature_edit.ui.components.ColorPickerDialog
@@ -104,7 +96,7 @@ fun EditNoteScreen(
                     val result = copyUriToInternalStorage(context, uri, getRandomString(8))
 
                     result?.let {
-                        component.onEvent(EditNoteAction.SelectImage(it))
+                        component.onEvent(SelectImage(it))
                     }
                 }
             }
@@ -162,8 +154,7 @@ fun EditNoteScreen(
     ) { padding ->
 
         if (component.showColorDialog.value) {
-            ColorPickerDialog(
-                currentColor = colorId,
+            ColorPickerDialog(currentColor = colorId,
                 onDismiss = { component.onEvent(HideColorPicker) }) {
                 component.onEvent(SetColor(it))
             }
@@ -228,8 +219,12 @@ fun EditNoteScreen(
                     capitalization = KeyboardCapitalization.Sentences,
                 ),
             )
-            ResizableContainer(animatedColor.value) {
-                ImageRow(modifier = Modifier.fillMaxWidth(), images = images)
+            if (images.isNotEmpty()){
+                ResizableContainer(animatedColor.value) {
+                    ImageRow(modifier = Modifier.fillMaxWidth(), images = images) {
+                        component.onEvent(DeleteImage(it))
+                    }
+                }
             }
             FormatButtons(
                 isFocused = isFocused,

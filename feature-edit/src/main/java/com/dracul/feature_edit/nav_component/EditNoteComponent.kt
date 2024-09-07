@@ -14,7 +14,8 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import com.dracul.feature_edit.event.EditNoteAction
 import com.dracul.feature_edit.event.EditNoteEvent
 import com.dracul.feature_edit.history.History
-import com.dracul.images.domain.usecase.DeleteImageByParentIdUseCase
+import com.dracul.images.domain.models.Image
+import com.dracul.images.domain.usecase.DeleteImageUseCase
 import com.dracul.images.domain.usecase.GetAllImagesByParentIdUseCase
 import com.dracul.images.domain.usecase.InsertImageUseCase
 import com.dracul.notes.domain.models.Note
@@ -43,7 +44,7 @@ class EditNoteComponent(
     private val updateNoteUseCase by inject<UpdateNoteUseCase>()
     private val deleteNoteUseCase by inject<DeleteNoteUseCase>()
     private val insertImageUseCase by inject<InsertImageUseCase>()
-    private val deleteImageByParentIdUseCase by inject<DeleteImageByParentIdUseCase>()
+    private val deleteImageUseCase by inject<DeleteImageUseCase>()
     private val getAllImagesByParentId by inject<GetAllImagesByParentIdUseCase>()
 
     private var note: Note = id.let {
@@ -181,10 +182,14 @@ class EditNoteComponent(
             }
 
             is EditNoteAction.SelectImage -> {
-                val image = com.dracul.images.domain.models.Image(
+                val image = Image(
                     id = 0, parentId = note.id, uri = action.uri
                 )
                 insertImageUseCase(image)
+            }
+
+            is EditNoteAction.DeleteImage -> {
+                deleteImageUseCase(action.image)
             }
         }
     }

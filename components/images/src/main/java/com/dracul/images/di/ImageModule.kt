@@ -12,8 +12,8 @@ import com.dracul.images.domain.repository.GetAllImagesByParentIdRepo
 import com.dracul.images.domain.repository.GetImageByIdRepo
 import com.dracul.images.domain.repository.InsertImageRepo
 import com.dracul.images.domain.repository.UpdateImageRepo
+import com.dracul.images.domain.usecase.DeleteImageByIdUseCase
 import com.dracul.images.domain.usecase.DeleteImageByParentIdImpl
-import com.dracul.images.domain.usecase.DeleteImageByParentIdUseCase
 import com.dracul.images.domain.usecase.DeleteImageImpl
 import com.dracul.images.domain.usecase.DeleteImageUseCase
 import com.dracul.images.domain.usecase.GetAllImagesByParentIdImpl
@@ -57,7 +57,7 @@ val imagesModule = module {
     single<DeleteImageUseCase> {
         DeleteImageImpl(get())
     }
-    single<DeleteImageByParentIdUseCase> {
+    single<DeleteImageByIdUseCase> {
         DeleteImageByParentIdImpl(get())
     }
     single<InsertImageUseCase> {
