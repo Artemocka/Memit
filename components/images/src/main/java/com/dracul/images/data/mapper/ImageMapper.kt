@@ -5,9 +5,9 @@ import com.dracul.images.domain.models.Image
 
 
 internal fun ImageEntity.toDomain(): Image = Image(
-    id = id, parentId = parentId, bitmap = bitmap
+    id = id, parentId = parentId, uri = uri
 )
 
 internal fun Image.toEntity(): ImageEntity = ImageEntity(
-    id = id, parentId = parentId, bitmap = bitmap
+    id = id, parentId = parentId,  uri = uri
 )

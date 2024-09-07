@@ -11,7 +11,7 @@ val MIGRATION_5_6 = object : Migration(5,6) {
             CREATE TABLE IF NOT EXISTS `ImageEntity` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `parentId` INTEGER NOT NULL,
-                `bitmap` BLOB NOT NULL
+                `uri` TEXT NOT NULL
             )
             """.trimIndent()
         )

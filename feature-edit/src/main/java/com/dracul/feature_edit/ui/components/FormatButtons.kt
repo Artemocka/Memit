@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.dracul.common.aliases.CommonDrawables
 import com.dracul.common.utills.getBlendedColor
 import com.dracul.common.utills.getColor
-import com.dracul.feature_edit.event.EditNoteEvent
+import com.dracul.feature_edit.event.EditNoteAction
 import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.mohamedrejeb.richeditor.model.RichTextState
 
@@ -65,105 +65,109 @@ fun FormatButtons(
             )
         ) == true
 
-    AnimatedVisibility(
-        visible = isFocused, enter = slideInVertically(
 
-            initialOffsetY = { +it }, animationSpec = tween(
-                200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
-            )
-        ) + fadeIn(tween(200)), exit = slideOutVertically(
-            targetOffsetY = { +it }, animationSpec = tween(
-                200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
-            )
-        ) + fadeOut(tween(200))
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .imePadding()
+            .padding(horizontal = 2.dp)
     ) {
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(scrollState)
-                .imePadding()
-                .padding(horizontal = 2.dp)
+        IconButton(
+            imageVector = Icons.Filled.Image,
+            color = color,
         ) {
-            IconButton(
-                imageVector = Icons.Filled.Image,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.AddPhoto)
-            }
-            IconButton(
-                imageVector = Icons.AutoMirrored.Filled.Undo,
-                color = color,
-                enabled = component.isHasPrev.value
-            ) {
-                component.onEvent(EditNoteEvent.Undo)
-            }
-            IconButton(
-                imageVector = Icons.AutoMirrored.Filled.Redo,
-                color = color,
-                enabled = component.isHasNext.value,
-            ) {
-                component.onEvent(EditNoteEvent.Redo)
-            }
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_bold),
-                expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetBold)
-            }
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_italic),
-                expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetItalic)
-            }
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_linethrough),
-                expr = lineThroughExpr,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetLinethrough)
-            }
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_underline),
-                expr = underlineExpr,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetUnderline)
-            }
+            component.onEvent(EditNoteAction.AddImage)
+        }
+        AnimatedVisibility(
+            visible = isFocused, enter = slideInVertically(
+
+                initialOffsetY = { +it }, animationSpec = tween(
+                    200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
+                )
+            ) + fadeIn(tween(200)), exit = slideOutVertically(
+                targetOffsetY = { +it }, animationSpec = tween(
+                    200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
+                )
+            ) + fadeOut(tween(200))
+        ) {
+            Row {
+                IconButton(
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
+                    color = color,
+                    enabled = component.isHasPrev.value
+                ) {
+                    component.onEvent(EditNoteAction.Undo)
+                }
+                IconButton(
+                    imageVector = Icons.AutoMirrored.Filled.Redo,
+                    color = color,
+                    enabled = component.isHasNext.value,
+                ) {
+                    component.onEvent(EditNoteAction.Redo)
+                }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_bold),
+                    expr = content.currentSpanStyle.fontWeight == FontWeight.Bold,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetBold)
+                }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_italic),
+                    expr = content.currentSpanStyle.fontStyle == FontStyle.Italic,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetItalic)
+                }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_linethrough),
+                    expr = lineThroughExpr,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetLinethrough)
+                }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_underline),
+                    expr = underlineExpr,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetUnderline)
+                }
 
 
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_align_left),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignStart)
-            }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_align_left),
+                    expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetAlignStart)
+                }
 
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_align_center),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignCenter)
-            }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_align_center),
+                    expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetAlignCenter)
+                }
 
-            IconButton(
-                painter = painterResource(id = CommonDrawables.ic_align_right),
-                expr = content.currentParagraphStyle.textAlign == TextAlign.End,
-                color = color,
-            ) {
-                component.onEvent(EditNoteEvent.SetAlignEnd)
-            }
+                IconButton(
+                    painter = painterResource(id = CommonDrawables.ic_align_right),
+                    expr = content.currentParagraphStyle.textAlign == TextAlign.End,
+                    color = color,
+                ) {
+                    component.onEvent(EditNoteAction.SetAlignEnd)
+                }
 
-            IconButton(imageVector = Icons.Filled.Clear, color = color) {
-                component.onEvent(EditNoteEvent.ClearALl)
+                IconButton(imageVector = Icons.Filled.Clear, color = color) {
+                    component.onEvent(EditNoteAction.ClearALl)
+                }
             }
         }
+
     }
 }
 

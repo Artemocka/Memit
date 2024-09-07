@@ -17,8 +17,7 @@ android {
     buildTypes {
         release {
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -40,6 +39,11 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":core"))
     implementation(project(":components:notes"))
+    implementation(project(":components:images"))
+    implementation(libs.coil.compose)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.lifecycle.runtime.compose.android)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.koin.android)
     implementation(libs.decompose.jetbrains)
     implementation(libs.decompose)
@@ -54,6 +58,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(project(":feature-main"))
     implementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.activity.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

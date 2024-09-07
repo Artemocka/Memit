@@ -11,8 +11,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
+import com.dracul.feature_edit.event.EditNoteAction
 import com.dracul.feature_edit.event.EditNoteEvent
 import com.dracul.feature_edit.history.History
+import com.dracul.images.domain.usecase.DeleteImageByParentIdUseCase
+import com.dracul.images.domain.usecase.GetAllImagesByParentIdUseCase
+import com.dracul.images.domain.usecase.InsertImageUseCase
 import com.dracul.notes.domain.models.Note
 import com.dracul.notes.domain.usecase.DeleteNoteUseCase
 import com.dracul.notes.domain.usecase.GetNoteByIdUseCase
@@ -22,6 +26,8 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,6 +42,9 @@ class EditNoteComponent(
     private val insertNoteUseCase by inject<InsertNoteUseCase>()
     private val updateNoteUseCase by inject<UpdateNoteUseCase>()
     private val deleteNoteUseCase by inject<DeleteNoteUseCase>()
+    private val insertImageUseCase by inject<InsertImageUseCase>()
+    private val deleteImageByParentIdUseCase by inject<DeleteImageByParentIdUseCase>()
+    private val getAllImagesByParentId by inject<GetAllImagesByParentIdUseCase>()
 
     private var note: Note = id.let {
         if (it == null) {
@@ -44,6 +53,9 @@ class EditNoteComponent(
             return@let getNoteByIdUseCase(it)
         }
     }
+    val images = getAllImagesByParentId(note.id)
+    private var _events = MutableSharedFlow<EditNoteEvent>(1)
+    val events: SharedFlow<EditNoteEvent> = _events
     val isCreate: Boolean = note.id.toInt() == 0
     private var _isStarred = mutableStateOf(note.pinned)
     var isStarred: State<Boolean> = _isStarred
@@ -81,13 +93,13 @@ class EditNoteComponent(
 
     val isHasNext: State<Boolean> = history.isHasNext
     val isHasPrev: State<Boolean> = history.isHasPrev
-    fun onEvent(event: EditNoteEvent) {
-        when (event) {
-            is EditNoteEvent.UpdateTitle -> {
-                _title.value = event.text
+    fun onEvent(action: EditNoteAction) {
+        when (action) {
+            is EditNoteAction.UpdateTitle -> {
+                _title.value = action.text
             }
 
-            is EditNoteEvent.Back -> {
+            is EditNoteAction.Back -> {
                 note = note.copy(
                     title = _title.value.trim(),
                     content = content.value.toHtml(),
@@ -98,23 +110,28 @@ class EditNoteComponent(
                 else note.isEmptyOrUpdate()
             }
 
-            EditNoteEvent.SetBold -> content.value.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            EditNoteEvent.SetItalic -> content.value.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-            EditNoteEvent.SetLinethrough -> content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-            EditNoteEvent.SetAlignCenter -> content.value.toggleParagraphStyle(
+            EditNoteAction.SetBold -> content.value.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+            EditNoteAction.SetItalic -> content.value.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+            EditNoteAction.SetLinethrough -> content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+            EditNoteAction.SetAlignCenter -> content.value.toggleParagraphStyle(
                 ParagraphStyle(
                     TextAlign.Center
                 )
             )
 
-            EditNoteEvent.SetAlignEnd -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
-            EditNoteEvent.SetAlignStart -> content.value.toggleParagraphStyle(
+            EditNoteAction.SetAlignEnd -> content.value.toggleParagraphStyle(
+                ParagraphStyle(
+                    TextAlign.End
+                )
+            )
+
+            EditNoteAction.SetAlignStart -> content.value.toggleParagraphStyle(
                 ParagraphStyle(
                     TextAlign.Start
                 )
             )
 
-            EditNoteEvent.ClearALl -> {
+            EditNoteAction.ClearALl -> {
                 content.value.currentSpanStyle.textDecoration?.let {
                     if (it.contains(TextDecoration.Underline)) content.value.toggleSpanStyle(
                         SpanStyle(textDecoration = TextDecoration.Underline)
@@ -127,15 +144,15 @@ class EditNoteComponent(
                 content.value.removeParagraphStyle(paragraphStyle = content.value.currentParagraphStyle)
             }
 
-            EditNoteEvent.SetUnderline -> {
+            EditNoteAction.SetUnderline -> {
                 content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
             }
 
-            EditNoteEvent.SetStarred -> {
+            EditNoteAction.SetStarred -> {
                 _isStarred.value = !_isStarred.value
             }
 
-            EditNoteEvent.DeleteNote -> {
+            EditNoteAction.DeleteNote -> {
                 if (note.id == 0.toLong()) {
                     onGoBack()
                 } else {
@@ -144,20 +161,31 @@ class EditNoteComponent(
                 }
             }
 
-            EditNoteEvent.ShowColorPicker -> _showColorDialog.value = true
-            EditNoteEvent.HideColorPicker -> _showColorDialog.value = false
-            is EditNoteEvent.SetColor -> _color.intValue = event.color
-            EditNoteEvent.Redo -> {
+            EditNoteAction.ShowColorPicker -> _showColorDialog.value = true
+            EditNoteAction.HideColorPicker -> _showColorDialog.value = false
+            is EditNoteAction.SetColor -> _color.intValue = action.color
+            EditNoteAction.Redo -> {
                 history.next()
                 content.value = history.current.value.value.copy()
             }
 
-            EditNoteEvent.Undo -> {
+            EditNoteAction.Undo -> {
                 history.prev()
                 content.value = history.current.value.value.copy()
             }
 
-            EditNoteEvent.AddPhoto -> TODO()
+            EditNoteAction.AddImage -> {
+                coroutineScope.launch {
+                    _events.emit(EditNoteEvent.ShowMediaRequest)
+                }
+            }
+
+            is EditNoteAction.SelectImage -> {
+                val image = com.dracul.images.domain.models.Image(
+                    id = 0, parentId = note.id, uri = action.uri
+                )
+                insertImageUseCase(image)
+            }
         }
     }
 

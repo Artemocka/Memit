@@ -5,9 +5,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.TypeConverters
 import androidx.room.Update
-import com.dracul.database.converters.BitmapConverter
 import kotlinx.coroutines.flow.Flow
 
 @Dao

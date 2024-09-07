@@ -1,18 +1,11 @@
 package com.dracul.common.utills
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.colorResource
 import com.dracul.common.aliases.CommonColors
-
-
 
 
 @Composable
@@ -40,6 +33,12 @@ fun getBlendedColor(id: Int): Color {
     val color = getColor(id = id)
     val white = colorResource(id = CommonColors.white)
     return lerp(color, white, 0.35f)
+}
+
+@Composable
+fun getBlendedColor(color: Color): Color {
+    val white = colorResource(id = CommonColors.black)
+    return lerp(color, white, 0.1f)
 }
 
 @Composable
