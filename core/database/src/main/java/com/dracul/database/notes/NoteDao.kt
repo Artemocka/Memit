@@ -18,7 +18,7 @@ interface NoteDao {
     fun getAll(): Flow<List<NoteEntity>>
 
     @Insert
-    fun insert(item: NoteEntity)
+    fun insert(item: NoteEntity):Long
 
     @Update
     fun update(item: NoteEntity)

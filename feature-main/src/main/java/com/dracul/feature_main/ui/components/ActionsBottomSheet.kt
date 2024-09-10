@@ -6,8 +6,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
@@ -52,13 +50,8 @@ import com.dracul.common.aliases.CommonStrings
 import com.dracul.common.models.CircleColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.noRippleClickable
-import com.dracul.feature_main.event.MainEvent
-import com.dracul.feature_main.event.MainEvent.DeleteNoteModal
-import com.dracul.feature_main.event.MainEvent.DuplicateNoteModal
-import com.dracul.feature_main.event.MainEvent.EditNoteModal
-import com.dracul.feature_main.event.MainEvent.HideBottomSheet
-import com.dracul.feature_main.event.MainEvent.ShareNoteModal
-import com.dracul.feature_main.event.MainEvent.ShowReminder
+import com.dracul.feature_main.event.MainAction
+import com.dracul.feature_main.event.MainAction.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
@@ -67,34 +60,30 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActionsBottomSheet(
     onDismiss: () -> Unit,
-    onEvent: (event: MainEvent) -> Unit,
+    onAction: (action: MainAction) -> Unit,
     onColorClick: (CircleColor) -> Unit,
     colorList: State<List<CircleColor>>,
 ) {
 
 
     val modalBottomSheetState = rememberModalBottomSheetState()
-    val localContext = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val editLambda = remember<() -> Unit> {
-        { onEvent(EditNoteModal) }
+        { onAction(EditNoteModal) }
     }
-    val duplicateLambda = remember<() -> Unit> {
-        { onEvent(DuplicateNoteModal) }
-    }
+
     val shareLambda = remember<() -> Unit> {
-        { onEvent(ShareNoteModal(localContext)) }
+        { onAction(ShareNoteModal) }
     }
     val deleteLambda = remember<() -> Unit> {
-        { onEvent(DeleteNoteModal) }
+        { onAction(DeleteNoteModal) }
     }
     val remindLambda = remember<() -> Unit> {
         {
-            onEvent(ShowReminder)
+            onAction(ShowReminder)
         }
     }
-
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -135,18 +124,7 @@ fun ActionsBottomSheet(
                 scope.launch {
                     modalBottomSheetState.hide()
                 }.invokeOnCompletion {
-                    onEvent(HideBottomSheet)
-
-                }
-            })
-        BottomSheetRow(image = painterResource(id = CommonDrawables.ic_copy),
-            text = stringResource(CommonStrings.duplicate),
-            onClick = {
-                duplicateLambda()
-                scope.launch {
-                    modalBottomSheetState.hide()
-                }.invokeOnCompletion {
-                    onEvent(HideBottomSheet)
+                    onAction(HideBottomSheet)
 
                 }
             })
@@ -158,7 +136,7 @@ fun ActionsBottomSheet(
                 scope.launch {
                     modalBottomSheetState.hide()
                 }.invokeOnCompletion {
-                    onEvent(HideBottomSheet)
+                    onAction(HideBottomSheet)
 
                 }
             })
@@ -170,7 +148,7 @@ fun ActionsBottomSheet(
                     scope.launch {
                         modalBottomSheetState.hide()
                     }.invokeOnCompletion {
-                        onEvent(HideBottomSheet)
+                        onAction(HideBottomSheet)
                     }
                 })
 
@@ -182,7 +160,7 @@ fun ActionsBottomSheet(
                 scope.launch {
                     modalBottomSheetState.hide()
                 }.invokeOnCompletion {
-                    onEvent(HideBottomSheet)
+                    onAction(HideBottomSheet)
                 }
             })
     }
