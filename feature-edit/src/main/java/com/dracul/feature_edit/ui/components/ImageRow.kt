@@ -42,7 +42,6 @@ fun ImageRow(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val lazyListState = rememberLazyListState()
-    val density = LocalDensity.current
 
     LazyRow(
         modifier = modifier
