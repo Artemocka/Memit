@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.dracul.common.utills.noRippleClickable
@@ -55,10 +56,19 @@ fun ImageRow(
             item.id
         }) { i, item ->
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context).data(item.uri).size(Size.ORIGINAL).build()
+                model = ImageRequest.Builder(context)
+                    .data(item.uri)
+                    .size(Size.ORIGINAL)
+                    .memoryCacheKey(item.id.hashCode().toString())
+                    .diskCacheKey(item.id.hashCode().toString())
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build()
             )
+
             Box(
-                modifier = Modifier.animateItemPlacement()
+                modifier = Modifier
+                    .animateItemPlacement()
                     .then(
                         when (i) {
                             0 -> Modifier.padding(start = 16.dp)

@@ -62,17 +62,14 @@ dependencies {
     implementation(project(":core:notification"))
     implementation(project(":feature-main"))
     implementation(project(":feature-reminder"))
-
-
+    implementation(libs.coil.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.common)
     implementation(project(":feature-edit"))
     implementation(project(":core:database"))
     ksp(libs.androidx.room.compiler)
-
     implementation(libs.androidx.work.runtime.ktx)
-
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
