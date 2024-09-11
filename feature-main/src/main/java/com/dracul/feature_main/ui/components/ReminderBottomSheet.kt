@@ -115,7 +115,6 @@ fun ReminderBottomSheet(
         onDismissRequest = {
             onDismissRequest()
         },
-        windowInsets = WindowInsets(bottom = 0),
     ) {
         Column(
             modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)

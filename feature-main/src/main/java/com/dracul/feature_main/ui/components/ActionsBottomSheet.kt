@@ -41,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -51,7 +50,11 @@ import com.dracul.common.models.CircleColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.noRippleClickable
 import com.dracul.feature_main.event.MainAction
-import com.dracul.feature_main.event.MainAction.*
+import com.dracul.feature_main.event.MainAction.DeleteNoteModal
+import com.dracul.feature_main.event.MainAction.EditNoteModal
+import com.dracul.feature_main.event.MainAction.HideBottomSheet
+import com.dracul.feature_main.event.MainAction.ShareNoteModal
+import com.dracul.feature_main.event.MainAction.ShowReminder
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
@@ -86,10 +89,10 @@ fun ActionsBottomSheet(
     }
 
     ModalBottomSheet(
+        modifier = Modifier.windowInsetsPadding(WindowInsets(bottom = 0)),
         onDismissRequest = { onDismiss() },
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        windowInsets = WindowInsets(bottom = 0),
     ) {
         val scrollState = rememberScrollState()
         Row(
