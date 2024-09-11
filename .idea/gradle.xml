@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/feature-edit" />
             <option value="$PROJECT_DIR$/feature-main" />
             <option value="$PROJECT_DIR$/feature-reminder" />
+            <option value="$PROJECT_DIR$/feature-viewer" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

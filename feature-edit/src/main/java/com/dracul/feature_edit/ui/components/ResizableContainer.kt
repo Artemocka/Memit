@@ -33,11 +33,11 @@ import kotlin.math.abs
 
 @Composable
 fun ResizableContainer(color: Color, content: @Composable () -> Unit) {
-    var targetHeight by remember { mutableStateOf(32.dp) }
+    var targetHeight by remember { mutableStateOf(140.dp) }
     val animatedHeight by animateDpAsState(
         targetValue = targetHeight, animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
-        )
+        ), label = ""
     )
     Box(
         Modifier

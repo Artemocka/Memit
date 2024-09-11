@@ -25,5 +25,7 @@ sealed interface EditNoteAction {
     data object AddImage : EditNoteAction
     data class DeleteImage(val image: Image) : EditNoteAction
     data class SelectImage(val uri: Uri) : EditNoteAction
+    data class ShowImage(val index:Int) : EditNoteAction
+    data object HideImage : EditNoteAction
 }
 

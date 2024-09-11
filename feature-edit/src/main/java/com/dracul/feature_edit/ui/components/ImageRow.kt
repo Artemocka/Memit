@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
@@ -34,10 +33,12 @@ import coil.size.Size
 import com.dracul.common.utills.noRippleClickable
 import com.dracul.images.domain.models.Image
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageRow(
-    modifier: Modifier = Modifier, images: List<Image>, onDelete: (imageId: Image) -> Unit
+    modifier: Modifier = Modifier,
+    images: List<Image>,
+    onDelete: (imageId: Image) -> Unit,
+    onClick: (index: Int) -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -55,19 +56,16 @@ fun ImageRow(
             item.id
         }) { i, item ->
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context)
-                    .data(item.uri)
-                    .size(Size.ORIGINAL)
+                model = ImageRequest.Builder(context).data(item.uri).size(Size.ORIGINAL)
                     .memoryCacheKey(item.id.hashCode().toString())
                     .diskCacheKey(item.id.hashCode().toString())
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
                     .build()
             )
 
             Box(
                 modifier = Modifier
-                    .animateItemPlacement()
+                    .animateItem(fadeInSpec = null, fadeOutSpec = null)
                     .then(
                         when (i) {
                             0 -> Modifier.padding(start = 16.dp)
@@ -82,7 +80,10 @@ fun ImageRow(
                     contentDescription = null,
                     modifier = Modifier
                         .size(88.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(12.dp))
+                        .noRippleClickable {
+                            onClick(i)
+                        },
                     contentScale = ContentScale.Crop,
                 )
                 Image(

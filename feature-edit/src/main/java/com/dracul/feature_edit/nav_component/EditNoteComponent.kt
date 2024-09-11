@@ -37,6 +37,7 @@ class EditNoteComponent(
     id: Long?,
     componentContext: ComponentContext,
     private val onGoBack: () -> Unit,
+    private val onViewer: (parentId: Long, index: Int) -> Unit,
 ) : ComponentContext by componentContext, KoinComponent {
 
     private val getNoteByIdUseCase by inject<GetNoteByIdUseCase>()
@@ -54,19 +55,15 @@ class EditNoteComponent(
             return@let getNoteByIdUseCase(it)
         }
     }
-    val images = getAllImagesByParentId(note.id)
-    private var _events = MutableSharedFlow<EditNoteEvent>(1)
-    val events: SharedFlow<EditNoteEvent> = _events
-    val isCreate: Boolean = note.id.toInt() == 0
-    private var _isStarred = mutableStateOf(note.pinned)
-    var isStarred: State<Boolean> = _isStarred
+
     private var _title = mutableStateOf(note.title)
     private val _color = mutableIntStateOf(note.color)
     private val _showColorDialog = mutableStateOf(false)
-    val showColorDialog: State<Boolean> = _showColorDialog
-    var content = mutableStateOf(RichTextState().setHtml(note.content).copy())
-    val title: State<String> = _title
-    val color: State<Int> = _color
+    private var _isStarred = mutableStateOf(note.pinned)
+    private var _events = MutableSharedFlow<EditNoteEvent>(0)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var history: History = History(RichTextState().setHtml(note.content).copy())
+    private var _imageToShow = mutableStateOf<Image?>(null)
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
         note = note.copy(
             title = _title.value.trim(),
@@ -77,8 +74,16 @@ class EditNoteComponent(
         if (note.id.toInt() == 0) note.isEmptyOrInsert()
         else note.isEmptyOrUpdate()
     }
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private var history: History = History(RichTextState().setHtml(note.content).copy())
+
+    val imageToShow = _imageToShow
+    val images = getAllImagesByParentId(note.id)
+    val events: SharedFlow<EditNoteEvent> = _events
+    val isCreate: Boolean = note.id.toInt() == 0
+    var isStarred: State<Boolean> = _isStarred
+    val showColorDialog: State<Boolean> = _showColorDialog
+    var content = mutableStateOf(RichTextState().setHtml(note.content).copy())
+    val title: State<String> = _title
+    val color: State<Int> = _color
 
     init {
         backHandler.register(backCallback)
@@ -191,6 +196,15 @@ class EditNoteComponent(
             is EditNoteAction.DeleteImage -> {
                 deleteImageUseCase(action.image)
             }
+
+            is EditNoteAction.ShowImage -> {
+
+                onViewer(
+                    note.id, action.index
+                )
+            }
+
+            EditNoteAction.HideImage -> _imageToShow.value = null
         }
     }
 

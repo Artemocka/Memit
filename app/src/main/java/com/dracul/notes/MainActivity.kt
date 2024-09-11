@@ -20,6 +20,7 @@ import com.arkivanov.decompose.retainedComponent
 import com.dracul.common.aliases.CommonStrings
 import com.dracul.feature_edit.ui.EditNoteScreen
 import com.dracul.feature_main.ui.screen.MainScreen
+import com.dracul.feature_viewer.ui.screen.ViewerScreen
 import com.dracul.notification.createNotificationChannel
 import com.dracul.notes.components.Prefs
 import com.dracul.notes.domain.models.Note
@@ -107,6 +108,7 @@ fun App(component: RootComponent) {
             when (val instance = child.instance) {
                 is RootComponent.Child.MainScreen -> MainScreen(instance.component)
                 is RootComponent.Child.EditNote -> EditNoteScreen(component = instance.component)
+                is RootComponent.Child.ViewerScreen -> ViewerScreen(component  = instance.component)
             }
         }
     }
