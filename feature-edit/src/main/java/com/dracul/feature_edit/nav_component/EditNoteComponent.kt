@@ -63,7 +63,6 @@ class EditNoteComponent(
     private var _events = MutableSharedFlow<EditNoteEvent>(0)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var history: History = History(RichTextState().setHtml(note.content).copy())
-    private var _imageToShow = mutableStateOf<Image?>(null)
     private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
         note = note.copy(
             title = _title.value.trim(),
@@ -75,7 +74,6 @@ class EditNoteComponent(
         else note.isEmptyOrUpdate()
     }
 
-    val imageToShow = _imageToShow
     val images = getAllImagesByParentId(note.id)
     val events: SharedFlow<EditNoteEvent> = _events
     val isCreate: Boolean = note.id.toInt() == 0
@@ -203,8 +201,6 @@ class EditNoteComponent(
                     note.id, action.index
                 )
             }
-
-            EditNoteAction.HideImage -> _imageToShow.value = null
         }
     }
 

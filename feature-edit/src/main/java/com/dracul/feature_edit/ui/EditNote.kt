@@ -2,7 +2,6 @@ package com.dracul.feature_edit.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -79,11 +78,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import coil.size.Size
 import com.dracul.common.aliases.CommonStrings
 import com.dracul.common.utills.copyUriToInternalStorage
 import com.dracul.common.utills.getBlendedColor
@@ -93,7 +87,6 @@ import com.dracul.feature_edit.event.EditNoteAction.Back
 import com.dracul.feature_edit.event.EditNoteAction.DeleteImage
 import com.dracul.feature_edit.event.EditNoteAction.DeleteNote
 import com.dracul.feature_edit.event.EditNoteAction.HideColorPicker
-import com.dracul.feature_edit.event.EditNoteAction.HideImage
 import com.dracul.feature_edit.event.EditNoteAction.SelectImage
 import com.dracul.feature_edit.event.EditNoteAction.SetColor
 import com.dracul.feature_edit.event.EditNoteAction.SetStarred
@@ -131,15 +124,11 @@ fun EditNoteScreen(
     val events = component.events
     val images by component.images.collectAsState(listOf())
     val coroutineScope = rememberCoroutineScope()
-    val imageToShow by component.imageToShow
     val density = LocalDensity.current
-    val scale = remember { mutableStateOf(1f) }
-    val rotationState = remember { mutableStateOf(1f) }
 
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
             uris.let {
-                // Grant read URI permission to access the selected URI
                 for (uri in uris) {
                     val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     context.contentResolver.takePersistableUriPermission(uri, flag)

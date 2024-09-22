@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.18.0")
     implementation("net.engawapg.lib:zoomable:1.6.2")
     implementation(platform(libs.androidx.compose.bom))
     implementation(project(":components:images"))
