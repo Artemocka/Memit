@@ -18,11 +18,7 @@ class RootComponent(
     private val navigation = StackNavigation<Configuration>()
 
     val childStack = childStack(
-        source = navigation,
-        serializer = Configuration.serializer(),
-        initialConfiguration = Configuration.MainScreen,
-        handleBackButton = true,
-        childFactory = ::сhild
+        source = navigation, serializer = Configuration.serializer(), initialConfiguration = Configuration.MainScreen, handleBackButton = true, childFactory = ::сhild
     )
 
 
@@ -32,28 +28,15 @@ class RootComponent(
         return when (config) {
             is Configuration.MainScreen -> Child.MainScreen(
                 MainComponent(componentContext = context,
-                    onEditNote = { navigation.pushNew(Configuration.EditNote(it)) })
+                    onEditNote = { navigation.pushNew(Configuration.EditNote(it)) },
+                    onViewer = { parentId: Long, index: Int -> navigation.pushNew(Configuration.ViewerScreen(parentId = parentId, index = index)) })
             )
 
-            is Configuration.EditNote -> Child.EditNote(
-                EditNoteComponent(
-                    id = config.id,
-                    componentContext = context,
-                    onGoBack = { navigation.pop() },
-                    onViewer = { parentId, index->
-                        navigation.pushNew(Configuration.ViewerScreen(parentId, index))
-                    }
-                )
-            )
+            is Configuration.EditNote -> Child.EditNote(EditNoteComponent(id = config.id, componentContext = context, onGoBack = { navigation.pop() }, onViewer = { parentId, index ->
+                navigation.pushNew(Configuration.ViewerScreen(parentId, index))
+            }))
 
-            is Configuration.ViewerScreen -> Child.ViewerScreen(
-                ViewerComponent(
-                    componentContext = context,
-                    parentId = config.parentId,
-                    index = config.index,
-                    onGoBack = {navigation.pop()}
-                )
-            )
+            is Configuration.ViewerScreen -> Child.ViewerScreen(ViewerComponent(componentContext = context, parentId = config.parentId, index = config.index, onGoBack = { navigation.pop() }))
         }
     }
 

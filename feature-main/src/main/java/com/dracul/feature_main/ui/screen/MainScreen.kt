@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dracul.feature_main.event.MainAction
 import com.dracul.feature_main.event.MainAction.CreateNote
 import com.dracul.feature_main.event.MainAction.CreateReminder
 import com.dracul.feature_main.event.MainAction.DeleteReminder
@@ -55,6 +57,9 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
+    val clickImageLambda = remember<(id: Long, index:Int) -> Unit> {
+        {id, index ->  component.onAction(MainAction.ViewImage(id = id, index = index))}
+    }
     val clickLambda = remember<(id: Long) -> Unit> {
         { component.onAction(EditNote(it)) }
     }
@@ -72,14 +77,9 @@ fun MainScreen(
             component.onAction(ShowReminderWithDelete(it))
         }
     }
-    val notes = component.notes.collectAsStateWithLifecycle(
-        initialValue = emptyList(),
-        lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
-    )
+    val notes by component.notes.collectAsState(emptyList())
     val showBottomSheet = component.showBottomSheet
-    val text = component.searchQuery.collectAsStateWithLifecycle(
-        initialValue = "", lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
-    )
+    val text by component.searchQuery.collectAsState()
     val showReminderDialog by component.showReminderDialog
     LaunchedEffect(Unit) {
         component.events.collect {
@@ -113,7 +113,7 @@ fun MainScreen(
         }
     }, topBar = {
         TopAppBarWithSearch(showSearchBox = component.showSearchBar.value,
-            text = text.value,
+            text = text,
             onEdit = {
                 component.onAction(SetSearchQuery(it))
             }) {
@@ -150,23 +150,21 @@ fun MainScreen(
             }
         }
 
-
-
-
         LazyVerticalStaggeredGrid(
             modifier = Modifier.padding(horizontal = 8.dp),
             columns = StaggeredGridCells.Adaptive(180.dp),
             contentPadding = padding,
         ) {
 
-            items(count = notes.value.size, key = {
-                notes.value[it].id
+            items(count = notes.size, key = {
+                notes[it].id
             }) { index ->
                 ItemGrid(
-                    modifier = Modifier.animateItemPlacement(tween(200)),
-                    item = notes.value[index],
+                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null, placementSpec = tween(200)),
+                    item = notes[index],
                     onItemClick = clickLambda,
                     onItemLongClick = longClickLambda,
+                    onImageClick = clickImageLambda,
                     onStarClick = starClickLambda,
                     onReminderClick = reminderClickLambda
                 )

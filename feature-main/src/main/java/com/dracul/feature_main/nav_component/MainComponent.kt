@@ -35,7 +35,8 @@ import java.util.concurrent.TimeUnit
 class MainComponent(
     componentContext: ComponentContext,
     private val onEditNote: (id: Long?) -> Unit,
-) : ComponentContext by componentContext, KoinComponent {
+    private val onViewer: (parentId: Long, index: Int) -> Unit,
+    ) : ComponentContext by componentContext, KoinComponent {
     val deleteNoteByIdUseCase by inject<DeleteNoteByIdUseCase>()
     val getNoteByIdUseCase by inject<GetNoteByIdUseCase>()
     val getAllNotesUseCase by inject<GetAllNotesUseCase>()
@@ -191,6 +192,10 @@ class MainComponent(
                     updateWorkerByIdUseCase(tempNote.id, null, null)
                 }
                 _showReminderDialogWithDelete.value = false
+            }
+
+            is MainAction.ViewImage -> {
+                onViewer(action.id, action.index)
             }
         }
     }

@@ -53,6 +53,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.dracul.common.utills.getColor
+import com.dracul.common.utills.noRippleClickable
 import com.dracul.images.domain.usecase.GetAllImagesByParentIdUseCase
 import com.dracul.notes.domain.models.Note
 import com.mohamedrejeb.richeditor.model.RichTextState
@@ -67,6 +68,7 @@ fun ItemGrid(
     modifier: Modifier = Modifier,
     item: Note,
     onItemClick: (Long) -> Unit,
+    onImageClick: (id: Long, index: Int) -> Unit,
     onItemLongClick: (Long) -> Unit,
     onStarClick: (Long, Boolean) -> Unit,
     onReminderClick: (Long) -> Unit,
@@ -78,11 +80,9 @@ fun ItemGrid(
     }
     val color = getColor(id = item.color)
     val animatedColor = remember { Animatable(color) }
-
     val images by getAllImagesByParentIdUseCase(item.id).collectAsState(emptyList())
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-
 
     LaunchedEffect(color) {
         animatedColor.animateTo(color, animationSpec = tween(300, easing = EaseInOutCubic))
@@ -92,41 +92,34 @@ fun ItemGrid(
             .fillMaxSize()
             .padding(4.dp)
             .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(onClick = { onItemClick(item.id) },
-                onLongClick = { onItemLongClick(item.id) }),
+            .combinedClickable(onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }),
         colors = CardDefaults.cardColors().copy(containerColor = animatedColor.value),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            Modifier
-                .fillMaxSize()
-
+            Modifier.fillMaxSize()
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                ,
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Top
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 8.dp, end = 8.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Top
             ) {
-
                 item.workerId?.let {
                     val formatter = SimpleDateFormat("dd MMM, hh:mm", java.util.Locale.getDefault())
                     val reminderTimeStamp = item.reminderTimeStamp!!
-                    Box(contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                            .wrapContentWidth()
-                            .height(21.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(
-                                BorderStroke(
-                                    1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant
-                                ), RoundedCornerShape(16.dp)
-                            )
-                            .clickable {
-                                onReminderClick(item.id)
-                            }) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier
+                        .padding(end = 4.dp)
+                        .wrapContentWidth()
+                        .height(21.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(
+                            BorderStroke(
+                                1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant
+                            ), RoundedCornerShape(16.dp)
+                        )
+                        .clickable {
+                            onReminderClick(item.id)
+                        }) {
                         Text(
 
                             modifier = Modifier.padding(horizontal = 6.dp),
@@ -136,7 +129,6 @@ fun ItemGrid(
                             textDecoration = if (System.currentTimeMillis() > reminderTimeStamp) TextDecoration.LineThrough else null
                         )
                     }
-
                 }
                 IconButton(
                     onClick = { onStarClick(item.id, item.pinned) }, modifier = Modifier.size(20.dp)
@@ -148,7 +140,8 @@ fun ItemGrid(
                 }
             }
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(horizontal = 8.dp)
 
             ) {
@@ -161,13 +154,14 @@ fun ItemGrid(
                     )
                 }
                 Text(
+                    modifier = if (images.isEmpty()) Modifier.padding(bottom = 4.dp) else Modifier,
                     text = RichTextState().setHtml(item.content).annotatedString,
                     maxLines = 8,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 16.sp,
                 )
             }
-            if (images.isNotEmpty()){
+            if (images.isNotEmpty()) {
                 Row(
                     modifier = Modifier
                         .horizontalScroll(scrollState)
@@ -175,31 +169,31 @@ fun ItemGrid(
                         .padding(vertical = 8.dp)
                         .height(48.dp)
                 ) {
-                    repeat(images.size) {
+                    repeat(images.size) {imageIndex->
                         val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(context).data(images[it].uri)
-                                .size(Size.ORIGINAL).memoryCacheKey(images[it].id.hashCode().toString())
-                                .diskCacheKey(images[it].id.hashCode().toString())
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .memoryCachePolicy(CachePolicy.ENABLED).build()
+                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL).memoryCacheKey(images[imageIndex].id.hashCode().toString())
+                                .diskCacheKey(images[imageIndex].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
                         )
                         Image(
-                            modifier = Modifier.then(
-                                when (it) {
-                                    0 -> Modifier.padding(start = 6.dp)
-                                    images.lastIndex -> Modifier.padding(end = 6.dp)
-                                    else -> Modifier.padding()
-                                }
-                            ).padding(horizontal = 3.dp).size(48.dp, 48.dp).clip(RoundedCornerShape(8.dp)),
-                            painter = painter,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds
+                            modifier = Modifier
+                                .then(
+                                    when (imageIndex) {
+                                        0 -> Modifier.padding(start = 6.dp)
+                                        images.lastIndex -> Modifier.padding(end = 6.dp)
+                                        else -> Modifier.padding()
+                                    }
+                                )
+                                .padding(horizontal = 3.dp)
+                                .size(48.dp, 48.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .noRippleClickable {
+                                    onImageClick(item.id, imageIndex)
+                                }, painter = painter, contentDescription = null, contentScale = ContentScale.FillBounds
                         )
                     }
                 }
             }
         }
-
     }
 }
 
@@ -207,11 +201,7 @@ fun ItemGrid(
 @Composable
 fun ItemGridPreview() {
     val note = Note(0, "Заметка", "Контент", color = 1, pinned = true)
-    ItemGrid(item = note,
-        onItemClick = {},
-        onItemLongClick = {},
-        onStarClick = { _, _ -> },
-        onReminderClick = {})
+//    ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { _, _ -> }, onReminderClick = {})
 }
 
 
@@ -229,8 +219,7 @@ fun ItemGridV1(
             .fillMaxSize()
             .padding(4.dp)
             .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(onClick = { onItemClick(item.id) },
-                onLongClick = { onItemLongClick(item.id) }),
+            .combinedClickable(onClick = { onItemClick(item.id) }, onLongClick = { onItemLongClick(item.id) }),
         colors = CardDefaults.cardColors().copy(containerColor = getColor(item.color)),
         shape = RoundedCornerShape(16.dp),
     ) {
@@ -246,8 +235,7 @@ fun ItemGridV1(
                 ) {
 
                 IconButton(
-                    onClick = { onStarClick(item.id, item.pinned) },
-                    modifier = Modifier
+                    onClick = { onStarClick(item.id, item.pinned) }, modifier = Modifier
                         .padding(end = 4.dp)
                         .size(20.dp)
                 ) {

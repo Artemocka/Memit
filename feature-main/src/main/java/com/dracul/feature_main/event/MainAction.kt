@@ -4,6 +4,7 @@ import com.dracul.common.models.CircleColor
 
 sealed interface MainAction {
     data class EditNote(val id: Long) : MainAction
+    data class ViewImage(val id: Long, val index:Int) : MainAction
     data class DeleteNote(val id: Long) : MainAction
     data class SetStarred(val id: Long, val pinned: Boolean) : MainAction
     data class SetSearchQuery(val query: String) : MainAction
