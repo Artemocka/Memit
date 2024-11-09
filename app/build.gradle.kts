@@ -9,12 +9,12 @@ plugins {
 android {
     val packageName = "com.dracul.notes"
     namespace = packageName
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.dracul.notes"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 8
         versionName = "1.2.1"
 
