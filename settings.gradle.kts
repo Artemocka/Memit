@@ -20,15 +20,17 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Notes"
-include(":app")
-include(":feature-main")
-include(":common")
-include(":core")
-include(":components")
-include(":components:notes")
-include(":feature-edit")
-include(":core:database")
-include(":feature-reminder")
-include(":core:notification")
-include(":components:images")
-include(":feature-viewer")
+include(
+    ":app",
+    ":common",
+    ":components",
+    ":components:images",
+    ":components:notes",
+    ":core",
+    ":core:database",
+    ":core:notification",
+    ":feature-edit",
+    ":feature-main",
+    ":feature-reminder",
+    ":feature-viewer",
+)

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -21,9 +22,6 @@ android {
             )
         }
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
     buildFeatures.compose = true
 
     compileOptions {
@@ -43,7 +41,7 @@ dependencies {
     implementation(project(":components:images"))
     implementation(libs.coil.compose)
     implementation(libs.accompanist.permissions)
-    implementation(libs.androidx.activity.compose.v191)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.decompose.jetbrains)
