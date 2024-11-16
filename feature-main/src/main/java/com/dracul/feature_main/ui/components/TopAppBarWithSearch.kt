@@ -1,5 +1,14 @@
 package com.dracul.feature_main.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,25 +56,25 @@ fun TopAppBarWithSearch(
         unfocusedIndicatorColor = Color.Transparent,
     )
     TopAppBar(title = {
-        if (showSearchBox) {
-            Row(
-                modifier = Modifier.padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SideEffect {
-                    focusRequester.requestFocus()
-                }
-                BasicTextField(value = text,
-                    onValueChange = onEdit,
-                    modifier = Modifier
+        AnimatedContent(targetState = showSearchBox, transitionSpec = {
+            slideInVertically(
+                tween(easing = EaseInOut, durationMillis = 250),
+            ) + fadeIn(tween(durationMillis = 250, easing = EaseInOut), initialAlpha = 1f) togetherWith slideOutVertically(
+                tween(durationMillis = 250, easing = EaseInOut),
+            ) + fadeOut(tween(easing = EaseInOut, durationMillis = 250), targetAlpha = 0.1f)
+        }, label = "") {
+            if (it) {
+                Row(
+                    modifier = Modifier.padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SideEffect {
+                        focusRequester.requestFocus()
+                    }
+                    BasicTextField(value = text, onValueChange = onEdit, modifier = Modifier
                         .weight(1f)
-                        .focusRequester(focusRequester),
-                    textStyle = TextStyle(
+                        .focusRequester(focusRequester), textStyle = TextStyle(
                         fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    singleLine = true,
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                    decorationBox = {
+                    ), singleLine = true, cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface), decorationBox = {
                         TextFieldDefaults.DecorationBox(
                             value = text,
                             innerTextField = it,
@@ -79,11 +88,9 @@ fun TopAppBarWithSearch(
                             shape = RoundedCornerShape(16.dp),
                             interactionSource = interactionSource,
                             trailingIcon = {
-                                Icon(imageVector = Icons.Filled.Close,
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable {
-                                        onClick()
-                                    })
+                                Icon(imageVector = Icons.Filled.Close, contentDescription = null, modifier = Modifier.clickable {
+                                    onClick()
+                                })
                             },
                             leadingIcon = {
                                 Icon(
@@ -92,15 +99,16 @@ fun TopAppBarWithSearch(
                             },
                         )
                     })
-            }
-        } else {
-            Row(
-                modifier = Modifier.padding(end = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = stringResource(CommonStrings.note), modifier = Modifier.weight(1f))
-                IconButton(onClick = onClick) {
-                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                }
+
+            } else {
+                Row(
+                    modifier = Modifier.padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = stringResource(CommonStrings.note), modifier = Modifier.weight(1f))
+                    IconButton(onClick = onClick) {
+                        Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                    }
                 }
             }
         }
