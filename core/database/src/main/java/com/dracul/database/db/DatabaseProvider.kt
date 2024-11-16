@@ -14,7 +14,8 @@ import com.dracul.database.notes.NoteEntity
         NoteEntity::class,
         ImageEntity::class
        ],
-    version = DatabaseProvider.VERSION
+    version = DatabaseProvider.VERSION,
+    exportSchema = false,
 )
 @TypeConverters(UriConverter::class)
 abstract class DatabaseProvider : RoomDatabase() {

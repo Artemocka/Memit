@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.dracul.feature_main"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
