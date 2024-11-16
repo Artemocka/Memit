@@ -114,7 +114,7 @@ class MainComponent(
 
             MainAction.DeleteNoteModal -> {
                 selectedItemId?.let { id ->
-                    getNoteByIdUseCase(id)
+                    deleteNoteByIdUseCase(id)
                 }
             }
 

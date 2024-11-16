@@ -2,7 +2,6 @@ package com.dracul.feature_main.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -100,7 +99,6 @@ fun TopAppBarWithSearch(
                         )
                     })
                 }
-
             } else {
                 Row(
                     modifier = Modifier.padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically
