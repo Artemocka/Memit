@@ -66,8 +66,6 @@ fun FormatButtons(
         ) == true
 
 
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()

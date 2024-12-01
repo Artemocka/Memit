@@ -1,5 +1,6 @@
 package com.dracul.feature_edit.nav_component
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -117,23 +118,11 @@ class EditNoteComponent(
             EditNoteAction.SetBold -> content.value.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
             EditNoteAction.SetItalic -> content.value.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
             EditNoteAction.SetLinethrough -> content.value.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-            EditNoteAction.SetAlignCenter -> content.value.toggleParagraphStyle(
-                ParagraphStyle(
-                    TextAlign.Center
-                )
-            )
+            EditNoteAction.SetAlignCenter -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.Center))
 
-            EditNoteAction.SetAlignEnd -> content.value.toggleParagraphStyle(
-                ParagraphStyle(
-                    TextAlign.End
-                )
-            )
+            EditNoteAction.SetAlignEnd -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.End))
 
-            EditNoteAction.SetAlignStart -> content.value.toggleParagraphStyle(
-                ParagraphStyle(
-                    TextAlign.Start
-                )
-            )
+            EditNoteAction.SetAlignStart -> content.value.toggleParagraphStyle(ParagraphStyle(TextAlign.Start))
 
             EditNoteAction.ClearALl -> {
                 content.value.currentSpanStyle.textDecoration?.let {

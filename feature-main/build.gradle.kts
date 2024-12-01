@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.android)
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0")
     implementation(libs.koin.compose)
     implementation(libs.decompose.jetbrains)
     implementation(libs.decompose)

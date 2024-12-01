@@ -49,6 +49,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -56,7 +57,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -126,22 +126,21 @@ fun EditNoteScreen(
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    val pickMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
-            uris.let {
-                for (uri in uris) {
-                    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    context.contentResolver.takePersistableUriPermission(uri, flag)
-                    coroutineScope.launch(Dispatchers.IO) {
-                        val result = copyUriToInternalStorage(context, uri, getRandomString(8))
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
+        uris.let {
+            for (uri in uris) {
+                val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, flag)
+                coroutineScope.launch(Dispatchers.IO) {
+                    val result = copyUriToInternalStorage(context, uri, getRandomString(8))
 
-                        result?.let {
-                            component.onEvent(SelectImage(it))
-                        }
+                    result?.let {
+                        component.onEvent(SelectImage(it))
                     }
                 }
             }
         }
+    }
     LaunchedEffect(Unit) {
         events.collect {
             when (it) {
@@ -189,16 +188,14 @@ fun EditNoteScreen(
                 }
                 IconButton(onClick = { component.onEvent(SetStarred) }) {
                     Icon(
-                        imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline,
-                        contentDescription = null
+                        imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline, contentDescription = null
                     )
                 }
             })
         },
     ) { padding ->
         if (component.showColorDialog.value) {
-            ColorPickerDialog(currentColor = colorId,
-                onDismiss = { component.onEvent(HideColorPicker) }) {
+            ColorPickerDialog(currentColor = colorId, onDismiss = { component.onEvent(HideColorPicker) }) {
                 component.onEvent(SetColor(it))
             }
         }
@@ -209,24 +206,20 @@ fun EditNoteScreen(
                 .padding(horizontal = 8.dp)
                 .navigationBarsPadding(),
         ) {
-            OutlinedTextField(
-                placeholder = { Text(text = stringResource(CommonStrings.title_optional)) },
+            OutlinedTextField(placeholder = { Text(text = stringResource(CommonStrings.title_optional)) },
                 value = title.value,
                 onValueChange = { component.onEvent(UpdateTitle(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-
-                    ),
+                ),
                 textStyle = TextStyle(fontSize = 20.sp)
             )
             HorizontalDivider(
@@ -277,10 +270,7 @@ fun EditNoteScreen(
                 }
             }
             FormatButtons(
-                isFocused = isFocused,
-                content = content.value,
-                component = component,
-                color = colorId
+                isFocused = isFocused, content = content.value, component = component, color = colorId
             )
         }
     }
@@ -305,17 +295,13 @@ fun ZoomableImage(
 
     BackHandler { onBackHandler() }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .combinedClickable(interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {},
-                onDoubleClick = {
-                    zoom = if (zoom > 1f) 1f
-                    else 3f
-                })
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)
+        .combinedClickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {}, onDoubleClick = {
+            zoom = if (zoom > 1f) 1f
+            else 3f
+        })
     ) {
         Image(painter = painter,
             contentDescription = contentDescription,
@@ -333,14 +319,12 @@ fun ZoomableImage(
                             val y = (pan.y * zoom)
                             val angleRad = angle * PI / 180.0
 
-                            offsetX =
-                                (offsetX + (x * cos(angleRad) - y * sin(angleRad)).toFloat()).coerceIn(
-                                    -(screenWidth * zoom)..(screenWidth * zoom)
-                                )
-                            offsetY =
-                                (offsetY + (x * sin(angleRad) + y * cos(angleRad)).toFloat()).coerceIn(
-                                    -(screenHeight * zoom)..(screenHeight * zoom)
-                                )
+                            offsetX = (offsetX + (x * cos(angleRad) - y * sin(angleRad)).toFloat()).coerceIn(
+                                -(screenWidth * zoom)..(screenWidth * zoom)
+                            )
+                            offsetY = (offsetY + (x * sin(angleRad) + y * cos(angleRad)).toFloat()).coerceIn(
+                                -(screenHeight * zoom)..(screenHeight * zoom)
+                            )
                         } else {
                             offsetX = 0F
                             offsetY = 0F

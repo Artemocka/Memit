@@ -23,8 +23,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dracul.feature_main.event.MainAction
 import com.dracul.feature_main.event.MainAction.CreateNote
 import com.dracul.feature_main.event.MainAction.CreateReminder
@@ -57,8 +55,8 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val clickImageLambda = remember<(id: Long, index:Int) -> Unit> {
-        {id, index ->  component.onAction(MainAction.ViewImage(id = id, index = index))}
+    val clickImageLambda = remember<(id: Long, index: Int) -> Unit> {
+        { id, index -> component.onAction(MainAction.ViewImage(id = id, index = index)) }
     }
     val clickLambda = remember<(id: Long) -> Unit> {
         { component.onAction(EditNote(it)) }
@@ -90,8 +88,7 @@ fun MainScreen(
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(
-                            Intent.EXTRA_TEXT,
-                            if (tempNote.title.isNotEmpty()) "${tempNote.title}\n${
+                            Intent.EXTRA_TEXT, if (tempNote.title.isNotEmpty()) "${tempNote.title}\n${
                                 RichTextState().setHtml(
                                     tempNote.content
                                 ).annotatedString
@@ -100,8 +97,8 @@ fun MainScreen(
                         )
                         type = "text/plain"
                     }
-                    startActivity(
-                        context, Intent.createChooser(sendIntent, tempNote.title), null
+                    context.startActivity(
+                        Intent.createChooser(sendIntent, tempNote.title), null
                     )
                 }
             }
@@ -112,11 +109,9 @@ fun MainScreen(
             Icon(imageVector = Icons.Default.Add, contentDescription = "add")
         }
     }, topBar = {
-        TopAppBarWithSearch(showSearchBox = component.showSearchBar.value,
-            text = text,
-            onEdit = {
-                component.onAction(SetSearchQuery(it))
-            }) {
+        TopAppBarWithSearch(showSearchBox = component.showSearchBar.value, text = text, onEdit = {
+            component.onAction(SetSearchQuery(it))
+        }) {
             component.onAction(ShowSearchBar)
         }
     }) { padding ->
