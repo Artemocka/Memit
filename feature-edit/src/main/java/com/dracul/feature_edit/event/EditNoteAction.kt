@@ -8,7 +8,7 @@ sealed interface EditNoteAction {
     data class UpdateTitle(val text: String) : EditNoteAction
     data class SetColor(val color: Int) : EditNoteAction
     data object Back : EditNoteAction
-    data object SetStarred : EditNoteAction
+    data object SetPinned : EditNoteAction
     data object DeleteNote : EditNoteAction
     data object SetBold : EditNoteAction
     data object SetItalic : EditNoteAction
@@ -22,9 +22,10 @@ sealed interface EditNoteAction {
     data object HideColorPicker : EditNoteAction
     data object Undo : EditNoteAction
     data object Redo : EditNoteAction
+    data object CloseScreen : EditNoteAction
     data object AddImage : EditNoteAction
     data class DeleteImage(val image: Image) : EditNoteAction
     data class SelectImage(val uri: Uri) : EditNoteAction
     data class ShowImage(val index:Int) : EditNoteAction
-}
 
+}

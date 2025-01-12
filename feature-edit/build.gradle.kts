@@ -34,7 +34,6 @@ android {
 
 dependencies {
     implementation(project(":common"))
-    implementation(project(":core"))
     implementation(project(":components:notes"))
     implementation(project(":components:images"))
     implementation(libs.coil.compose)

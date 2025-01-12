@@ -57,7 +57,6 @@ dependencies {
     implementation(project(":components:notes"))
     implementation(project(":components:images"))
     implementation(project(":common"))
-    implementation(project(":core"))
     implementation(project(":core:database"))
     implementation(project(":core:notification"))
     implementation(project(":feature-main"))

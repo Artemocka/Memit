@@ -6,28 +6,40 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.stack.animation.isFront
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatable
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimatable
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimator
 import com.arkivanov.decompose.retainedComponent
 import com.dracul.common.aliases.CommonStrings
 import com.dracul.feature_edit.ui.EditNoteScreen
 import com.dracul.feature_main.ui.screen.MainScreen
 import com.dracul.feature_viewer.ui.screen.ViewerScreen
-import com.dracul.notification.createNotificationChannel
 import com.dracul.notes.components.Prefs
 import com.dracul.notes.domain.models.Note
 import com.dracul.notes.domain.usecase.InsertNoteUseCase
 import com.dracul.notes.navigation.RootComponent
 import com.dracul.notes.ui.theme.NotesTheme
 import com.dracul.notes.viewmodels.ActivityViewModel
+import com.dracul.notification.createNotificationChannel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -45,7 +57,6 @@ class MainActivity : ComponentActivity(), KoinComponent {
             val id = it.getLongExtra("NOTE_ID", -1)
             if (id == (-1).toLong()) null else id
         }
-
 
         val prefs = Prefs(context = applicationContext)
         if (prefs.isFirstLaunch) {
@@ -97,13 +108,20 @@ class MainActivity : ComponentActivity(), KoinComponent {
     }
 }
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun App(component: RootComponent) {
     NotesTheme {
         Children(
-            stack = component.childStack, animation = stackAnimation(
-                fade(tween(300, easing = EaseInOut)) + slide(tween(300, easing = EaseInOut))
-            )
+            stack = component.childStack,
+            animation = predictiveBackAnimation(
+                backHandler = component.backHandler,
+                fallbackAnimation = stackAnimation(fade()+slide()),
+                selector = { backEvent, _, _ ->
+                    androidPredictiveBackAnimatable(backEvent)
+                },
+                onBack = component::onBackClicked,
+            ),
         ) { child ->
             when (val instance = child.instance) {
                 is RootComponent.Child.MainScreen -> MainScreen(instance.component)
@@ -113,5 +131,3 @@ fun App(component: RootComponent) {
         }
     }
 }
-
-

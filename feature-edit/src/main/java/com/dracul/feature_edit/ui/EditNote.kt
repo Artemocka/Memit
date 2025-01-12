@@ -1,8 +1,6 @@
 package com.dracul.feature_edit.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,26 +14,21 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
@@ -49,33 +42,27 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dracul.common.aliases.CommonStrings
@@ -83,16 +70,7 @@ import com.dracul.common.utills.copyUriToInternalStorage
 import com.dracul.common.utills.getBlendedColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.getRandomString
-import com.dracul.feature_edit.event.EditNoteAction.Back
-import com.dracul.feature_edit.event.EditNoteAction.DeleteImage
-import com.dracul.feature_edit.event.EditNoteAction.DeleteNote
-import com.dracul.feature_edit.event.EditNoteAction.HideColorPicker
-import com.dracul.feature_edit.event.EditNoteAction.SelectImage
-import com.dracul.feature_edit.event.EditNoteAction.SetColor
-import com.dracul.feature_edit.event.EditNoteAction.SetStarred
-import com.dracul.feature_edit.event.EditNoteAction.ShowColorPicker
-import com.dracul.feature_edit.event.EditNoteAction.ShowImage
-import com.dracul.feature_edit.event.EditNoteAction.UpdateTitle
+import com.dracul.feature_edit.event.EditNoteAction.*
 import com.dracul.feature_edit.event.EditNoteEvent
 import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.dracul.feature_edit.ui.components.ColorPickerDialog
@@ -103,30 +81,24 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun EditNoteScreen(
-    component: EditNoteComponent
-) {
-    val title = component.title
-    val content = component.content
-    val colorId by component.color
+fun EditNoteScreen(component: EditNoteComponent) {
+    val state = component.state
+    val colorId = state.color
     val color = getColor(id = colorId)
     val animatedColor = remember { Animatable(color) }
-
-    val isStarred by component.isStarred
     val context = LocalContext.current
     val events = component.events
-    val images by component.images.collectAsState(listOf())
+    val images by component.state.images.collectAsState(listOf())
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
-
-    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
+    val isImeVisible = WindowInsets.isImeVisible
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { uris ->
         uris.let {
             for (uri in uris) {
                 val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -153,7 +125,12 @@ fun EditNoteScreen(
     LaunchedEffect(color) {
         animatedColor.animateTo(color, animationSpec = tween(500, easing = EaseInOutCubic))
     }
-
+    LaunchedEffect(isImeVisible) {
+        if (!isImeVisible) {
+            component.onEvent(CloseScreen)
+            focusManager.clearFocus()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.background(color = Color.Transparent),
@@ -161,9 +138,7 @@ fun EditNoteScreen(
         topBar = {
             TopAppBar(title = {
                 Text(
-                    text = if (component.isCreate) stringResource(CommonStrings.create) else stringResource(
-                        CommonStrings.edit
-                    )
+                    text = if (component.state.isCreate) stringResource(CommonStrings.create) else stringResource(CommonStrings.edit)
                 )
             }, navigationIcon = {
                 IconButton({ component.onEvent(Back) }) {
@@ -186,15 +161,15 @@ fun EditNoteScreen(
                         imageVector = Icons.Filled.Delete, contentDescription = "Delete"
                     )
                 }
-                IconButton(onClick = { component.onEvent(SetStarred) }) {
+                IconButton(onClick = { component.onEvent(SetPinned) }) {
                     Icon(
-                        imageVector = if (isStarred) Icons.Filled.Star else Icons.Filled.StarOutline, contentDescription = null
+                        imageVector = if (state.pinned) Icons.Filled.Star else Icons.Filled.StarOutline, contentDescription = null
                     )
                 }
             })
         },
     ) { padding ->
-        if (component.showColorDialog.value) {
+        if (component.state.showColorDialog) {
             ColorPickerDialog(currentColor = colorId, onDismiss = { component.onEvent(HideColorPicker) }) {
                 component.onEvent(SetColor(it))
             }
@@ -206,9 +181,10 @@ fun EditNoteScreen(
                 .padding(horizontal = 8.dp)
                 .navigationBarsPadding(),
         ) {
-            OutlinedTextField(placeholder = { Text(text = stringResource(CommonStrings.title_optional)) },
-                value = title.value,
+            OutlinedTextField(
+                value = component.state.title,
                 onValueChange = { component.onEvent(UpdateTitle(it)) },
+                placeholder = { Text(text = stringResource(CommonStrings.title_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -225,10 +201,9 @@ fun EditNoteScreen(
             HorizontalDivider(
                 Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.onSurface
             )
-            val interactionSource = remember { MutableInteractionSource() }
-            val isFocused by interactionSource.collectIsFocusedAsState()
+
             RichTextEditor(
-                state = content.value,
+                state = state.content,
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
@@ -270,75 +245,7 @@ fun EditNoteScreen(
                 }
             }
             FormatButtons(
-                isFocused = isFocused, content = content.value, component = component, color = colorId
-            )
-        }
-    }
-}
-
-@SuppressLint("AutoboxingStateCreation")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
-@Composable
-fun ZoomableImage(
-    painter: Painter,
-    contentDescription: String? = null,
-    onBackHandler: () -> Unit,
-) {
-    val angle by remember { mutableFloatStateOf(0f) }
-    var zoom by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp.value
-    val screenHeight = configuration.screenHeightDp.dp.value
-
-    BackHandler { onBackHandler() }
-
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Black)
-        .combinedClickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {}, onDoubleClick = {
-            zoom = if (zoom > 1f) 1f
-            else 3f
-        })
-    ) {
-        Image(painter = painter,
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .graphicsLayer(
-                    scaleX = zoom, scaleY = zoom, rotationZ = angle
-                )
-                .pointerInput(Unit) {
-                    detectTransformGestures(onGesture = { _, pan, gestureZoom, _ ->
-                        zoom = (zoom * gestureZoom).coerceIn(1F..4F)
-                        if (zoom > 1) {
-                            val x = (pan.x * zoom)
-                            val y = (pan.y * zoom)
-                            val angleRad = angle * PI / 180.0
-
-                            offsetX = (offsetX + (x * cos(angleRad) - y * sin(angleRad)).toFloat()).coerceIn(
-                                -(screenWidth * zoom)..(screenWidth * zoom)
-                            )
-                            offsetY = (offsetY + (x * sin(angleRad) + y * cos(angleRad)).toFloat()).coerceIn(
-                                -(screenHeight * zoom)..(screenHeight * zoom)
-                            )
-                        } else {
-                            offsetX = 0F
-                            offsetY = 0F
-                        }
-                    })
-                }
-                .fillMaxSize())
-        IconButton(
-            onClick = onBackHandler
-        ) {
-            Image(
-                modifier = Modifier.size(18.dp),
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Close full screen",
+                isFocused = isFocused, content = state.content, component = component, color = colorId
             )
         }
     }

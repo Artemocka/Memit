@@ -1,39 +1,40 @@
 [versions]
 accompanistPermissions = "0.33.1-alpha"
-agp = "8.7.2"
+agp = "8.8.0"
 coilCompose = "2.7.0"
-kotlin = "2.0.21"
+constraintlayoutCompose = "1.1.0"
+kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 activityCompose = "1.9.3"
-composeBom = "2024.11.00"
+composeBom = "2024.12.01"
 kotlinxCoroutinesCore = "1.8.1"
 kotlinxSerializationJson = "1.6.3"
-decompose = "3.2.2"
+decompose = "3.3.0-alpha01"
 extensionsComposeAndroid = "3.2.2"
 lifecycleRuntimeComposeAndroid = "2.8.7"
 material = "1.12.0"
-materialIconsExtended = "1.7.5"
-richeditorCompose = "1.0.0-rc09"
+materialIconsExtended = "1.7.6"
+richeditorCompose = "1.0.0-rc05"
 koin = "3.5.6"
 appcompat = "1.7.0"
-animationAndroid = "1.7.5"
-foundationAndroid = "1.7.5"
+animationAndroid = "1.7.6"
+foundationAndroid = "1.7.6"
 material3Android = "1.3.1"
-uiToolingPreviewAndroid = "1.7.5"
-runtimeAndroid = "1.7.5"
+uiToolingPreviewAndroid = "1.7.6"
+runtimeAndroid = "1.7.6"
 roomRuntime = "2.6.1"
 roomCommon =  "2.6.1"
-uiAndroid = "1.7.5"
+uiAndroid = "1.7.6"
 workRuntimeKtx = "2.10.0"
-uiTooling = "1.7.5"
+uiTooling = "1.7.6"
 activityKtx = "1.9.3"
-media3Exoplayer = "1.4.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
@@ -73,7 +74,6 @@ androidx-room-common = { group = "androidx.room", name = "room-common", version.
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
-androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

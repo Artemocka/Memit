@@ -1,15 +1,10 @@
 package com.dracul.feature_viewer.nav_component
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.backhandler.BackCallback
-import com.dracul.feature_viewer.event.ViewerAction
-import com.dracul.feature_viewer.event.ViewerEvent
+import com.dracul.feature_viewer.mvi.ViewerAction
+import com.dracul.feature_viewer.mvi.ViewerEvent
+import com.dracul.feature_viewer.mvi.ViewerState
 import com.dracul.images.domain.usecase.GetAllImagesByParentIdUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -21,19 +16,23 @@ class ViewerComponent(
 ) : ComponentContext by componentContext, KoinComponent {
     private val getAllImagesByParentIdUseCase by inject<GetAllImagesByParentIdUseCase>()
     val images = getAllImagesByParentIdUseCase(parentId)
-    private val backCallback = BackCallback(priority = Int.MAX_VALUE) {
-        coroutineScope.launch {
-        }
-        onGoBack()
-    }
-    private val _events = MutableSharedFlow<ViewerEvent>(0)
-    val events = _events.asSharedFlow()
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    var state = ViewerState(
+        showUi = true,
+        currentImage = index,
+        isSliderScrollInProgress = false,
+        isPagerScrollInProgress = false,
+//        event = ViewerEvent.SlideAll(index)
+    )
+
     fun onAction(action: ViewerAction) {
         when (action) {
-            ViewerAction.Exit -> {
-                onGoBack()
-            }
+            ViewerAction.Exit -> onGoBack()
+            ViewerAction.Click -> state.showUi = !state.showUi
+            is ViewerAction.SetCurrentImage -> state.currentImage = action.index
+            is ViewerAction.SlideImage -> state.currentImage = action.index
+            is ViewerAction.PagerTargetImage -> state.currentImage = action.index
+            is ViewerAction.PagerScrollInProgress -> state.isPagerScrollInProgress = action.inProgrees
+            is ViewerAction.SliderScrollInProgress -> state.isSliderScrollInProgress = action.inProgrees
         }
     }
 }

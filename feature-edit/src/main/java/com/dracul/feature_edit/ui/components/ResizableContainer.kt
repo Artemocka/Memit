@@ -32,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,10 @@ fun ResizableContainer(color: Color, content: @Composable () -> Unit) {
             dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
         ), label = ""
     )
+    var hapticFeedback = LocalHapticFeedback.current
+    LaunchedEffect(targetHeight) {
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+    }
     Box(
         Modifier
             .fillMaxWidth()
@@ -61,7 +67,6 @@ fun ResizableContainer(color: Color, content: @Composable () -> Unit) {
                         when {
                             y > 0 -> {
                                 targetHeight = 32.dp
-
                             }
 
                             y < 0 -> {

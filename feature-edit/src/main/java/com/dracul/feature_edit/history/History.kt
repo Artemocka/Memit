@@ -16,7 +16,7 @@ class ListNode<RichTextState>(
 )
 
 
-class History(state: RichTextState) {
+data class History(val state: RichTextState) {
     private var node = MutableStateFlow(ListNode(state))
     val current = node.asStateFlow()
     var isHasNext = mutableStateOf(node.value.next != null)

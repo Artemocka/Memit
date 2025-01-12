@@ -26,7 +26,6 @@ include(
     ":components",
     ":components:images",
     ":components:notes",
-    ":core",
     ":core:database",
     ":core:notification",
     ":feature-edit",

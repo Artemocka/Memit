@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.dracul.common.aliases.CommonStrings
 import com.dracul.common.utills.noRippleClickable
-import com.dracul.common.utills.poop
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +66,7 @@ fun TopAppBarWithSearch(
         ), label = ""
     )
 
-    alpha = ((currentWidth - minWidth)/(maxWidth-minWidth))*3f
+    alpha = ((currentWidth - minWidth) / (maxWidth - minWidth)) * 2.5f
     target = if (showSearchBox) maxWidth else minWidth
 
     TopAppBar(title = {
@@ -80,13 +79,13 @@ fun TopAppBarWithSearch(
                     placeable.place(0, 0)
                 }
             }) {
+
             val (textField) = createRefs()
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
             ) {
                 Text(text = stringResource(CommonStrings.note), modifier = Modifier.weight(1f))
                 IconButton(onClick = {}) {
@@ -102,6 +101,7 @@ fun TopAppBarWithSearch(
                         })
                 }
             }
+
             Row(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -111,10 +111,9 @@ fun TopAppBarWithSearch(
                     },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (currentWidth >= minWidth+1.dp) {
+                if (currentWidth >= minWidth + 1.dp) {
                     SearchTextField(
-                        modifier = Modifier
-                            .alpha(alpha),
+                        modifier = Modifier.alpha(alpha),
                         value = text,
                         onValueChange = onEdit,
                         onClick = onClick,
@@ -135,14 +134,16 @@ fun SearchTextField(value: String, onValueChange: (String) -> Unit, onClick: () 
     }
     val interactionSource = remember { MutableInteractionSource() }
     val colors = TextFieldDefaults.colors(
-        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
-    BasicTextField(value = value, onValueChange = onValueChange, modifier
-        .fillMaxWidth()
-        .padding(end = 14.dp)
-        .focusRequester(focusRequester), textStyle = TextStyle(
+    BasicTextField(value = value, onValueChange = onValueChange,
+        modifier
+            .fillMaxWidth()
+            .padding(end = 14.dp)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
+            .focusRequester(focusRequester), textStyle = TextStyle(
         fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface
     ), singleLine = true, cursorBrush = SolidColor(MaterialTheme.colorScheme.outline), decorationBox = {
         TextFieldDefaults.DecorationBox(

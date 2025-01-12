@@ -104,6 +104,7 @@ fun MainScreen(
             }
         }
     }
+    
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = { component.onAction(CreateNote) }) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "add")
@@ -125,6 +126,7 @@ fun MainScreen(
             }, colorList = component.colorsList
             )
         }
+
         if (showReminderDialog) {
             ReminderBottomSheet(onDismissRequest = {
                 component.onAction(HideReminder)
@@ -150,7 +152,6 @@ fun MainScreen(
             columns = StaggeredGridCells.Adaptive(180.dp),
             contentPadding = padding,
         ) {
-
             items(count = notes.size, key = {
                 notes[it].id
             }) { index ->

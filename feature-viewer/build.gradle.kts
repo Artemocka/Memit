@@ -45,6 +45,7 @@ dependencies {
     implementation("net.engawapg.lib:zoomable:1.6.2")
     implementation(platform(libs.androidx.compose.bom))
     implementation(project(":components:images"))
+    implementation(project(":common"))
     implementation(libs.koin.android)
     implementation(libs.decompose.jetbrains)
     implementation(libs.decompose)
@@ -56,7 +57,4 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.tooling.preview.android)
     implementation(libs.androidx.ui.tooling.preview.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

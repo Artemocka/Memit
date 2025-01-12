@@ -32,7 +32,7 @@ class RootComponent(
                     onViewer = { parentId: Long, index: Int -> navigation.pushNew(Configuration.ViewerScreen(parentId = parentId, index = index)) })
             )
 
-            is Configuration.EditNote -> Child.EditNote(EditNoteComponent(id = config.id, componentContext = context, onGoBack = { navigation.pop() }, onViewer = { parentId, index ->
+            is Configuration.EditNote -> Child.EditNote(EditNoteComponent(id = config.id, componentContext = context, onGoBack = { onBackClicked() }, onViewer = { parentId, index ->
                 navigation.pushNew(Configuration.ViewerScreen(parentId, index))
             }))
 
@@ -42,6 +42,10 @@ class RootComponent(
 
     fun onDeepLink(initialItemId: Long) {
         navigation.pushNew(Configuration.EditNote(id = initialItemId))
+    }
+
+    fun onBackClicked() {
+        navigation.pop()
     }
 
     sealed class Child {
