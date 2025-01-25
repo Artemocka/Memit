@@ -1,12 +1,13 @@
 package com.dracul.notes.data.repository
 
-import com.dracul.notes.domain.models.Note
-import com.dracul.notes.domain.repository.InsertNoteRepo
 import com.dracul.database.db.DatabaseProviderWrap
 import com.dracul.notes.data.mapper.toEntity
+import com.dracul.notes.domain.models.Note
+import com.dracul.notes.domain.repository.InsertNoteRepo
 
-class InsertNoteImpl:InsertNoteRepo {
-    override fun invoke(item: Note) {
+class InsertNoteImpl : InsertNoteRepo {
+
+    override fun invoke(item: Note): Long =
         DatabaseProviderWrap.noteDao.insert(item.toEntity())
-    }
+
 }

@@ -53,11 +53,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -113,6 +111,7 @@ fun EditNoteScreen(component: EditNoteComponent) {
             }
         }
     }
+
     LaunchedEffect(Unit) {
         events.collect {
             when (it) {
@@ -137,34 +136,22 @@ fun EditNoteScreen(component: EditNoteComponent) {
         containerColor = animatedColor.value,
         topBar = {
             TopAppBar(title = {
-                Text(
-                    text = if (component.state.isCreate) stringResource(CommonStrings.create) else stringResource(CommonStrings.edit)
-                )
+                Text(text = if (component.state.isCreate) stringResource(CommonStrings.create) else stringResource(CommonStrings.edit))
             }, navigationIcon = {
                 IconButton({ component.onEvent(Back) }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
-                    )
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
             }, colors = TopAppBarDefaults.largeTopAppBarColors().copy(
                 containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent
             ), actions = {
-                IconButton(onClick = {
-                    component.onEvent(ShowColorPicker)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.ColorLens, contentDescription = "Delete"
-                    )
+                IconButton(onClick = { component.onEvent(ShowColorPicker) }) {
+                    Icon(imageVector = Icons.Filled.ColorLens, contentDescription = "Delete")
                 }
                 IconButton(onClick = { component.onEvent(DeleteNote) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete, contentDescription = "Delete"
-                    )
+                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete")
                 }
                 IconButton(onClick = { component.onEvent(SetPinned) }) {
-                    Icon(
-                        imageVector = if (state.pinned) Icons.Filled.Star else Icons.Filled.StarOutline, contentDescription = null
-                    )
+                    Icon(imageVector = if (state.pinned) Icons.Filled.Star else Icons.Filled.StarOutline, contentDescription = null)
                 }
             })
         },
@@ -201,26 +188,21 @@ fun EditNoteScreen(component: EditNoteComponent) {
             HorizontalDivider(
                 Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.onSurface
             )
-
             RichTextEditor(
-                state = state.content,
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
                     .background(Color.Transparent),
+                state = state.content,
                 interactionSource = interactionSource,
-                textStyle = TextStyle(
-                    fontSize = 18.sp
-                ),
+                textStyle = TextStyle(fontSize = 18.sp),
                 colors = RichTextEditorDefaults.richTextEditorColors(
                     containerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     cursorColor = MaterialTheme.colorScheme.onSurface,
-                    selectionColors = TextSelectionColors(
-                        getBlendedColor(id = colorId), getBlendedColor(id = colorId)
-                    ),
+                    selectionColors = TextSelectionColors(getBlendedColor(id = colorId), getBlendedColor(id = colorId)),
                 ),
                 placeholder = { Text(text = stringResource(CommonStrings.content)) },
                 keyboardOptions = KeyboardOptions(

@@ -85,7 +85,12 @@ class EditNoteComponent(
             is EditNoteAction.UpdateTitle -> state.title = action.text
             is EditNoteAction.SetColor -> state.color = action.color
             is EditNoteAction.Back -> {
-                val note = state.note.copy(title = state.title.trim(), content = state.content.toHtml(), pinned = state.pinned, color = state.color)
+                val note = state.note.copy(
+                    title = state.title.trim(),
+                    content = state.content.toHtml(),
+                    pinned = state.pinned,
+                    color = state.color
+                )
                 if (note.id.toInt() == 0) note.isEmptyOrInsert() else note.isEmptyOrUpdate()
                 onGoBack()
             }
@@ -158,22 +163,24 @@ class EditNoteComponent(
             }
             is EditNoteAction.DeleteImage -> deleteImageUseCase(action.image)
             is EditNoteAction.ShowImage -> onViewer(note.id, action.index)
-            EditNoteAction.CloseScreen -> if (state.title.isNotEmpty() || state.content.toMarkdown().isNotEmpty()) save()
+            EditNoteAction.CloseScreen -> if (state.title.isNotEmpty() || state.content.toMarkdown()
+                    .isNotEmpty()
+            ) save()
         }
     }
 
     private fun save() {
         val note = state.note.copy(
-            title = state.title.trim(), content = state.content.toHtml(), pinned = state.pinned, color = state.color
+            title = state.title.trim(),
+            content = state.content.toHtml(),
+            pinned = state.pinned,
+            color = state.color
         )
         if (state.note.id.toInt() == 0) note.isEmptyOrInsert() else note.isEmptyOrUpdate()
     }
 
-    private fun Note.isEmptyOrUpdate() {
-        updateNoteUseCase(this)
-    }
+    private fun Note.isEmptyOrUpdate() = updateNoteUseCase(this)
 
-    private fun Note.isEmptyOrInsert() {
-        insertNoteUseCase(this)
-    }
+    private fun Note.isEmptyOrInsert() = insertNoteUseCase(this)
+
 }

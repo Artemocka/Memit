@@ -8,9 +8,9 @@ interface InsertImageUseCase {
 }
 
 class InsertImageImpl(
-    val repo: InsertImageRepo
+    val repository: InsertImageRepo
 ) : InsertImageUseCase {
-    override fun invoke(image: Image) {
-        repo(image)
-    }
+
+    override fun invoke(image: Image) = repository(image)
+
 }

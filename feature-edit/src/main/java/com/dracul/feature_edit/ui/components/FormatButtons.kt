@@ -44,27 +44,28 @@ import com.dracul.feature_edit.event.EditNoteAction
 import com.dracul.feature_edit.nav_component.EditNoteComponent
 import com.mohamedrejeb.richeditor.model.RichTextState
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FormatButtons(
     isFocused: Boolean, content: RichTextState, component: EditNoteComponent, color: Int
 ) {
     val scrollState = rememberScrollState()
-
     val underlineExpr =
-        content.currentSpanStyle.textDecoration == TextDecoration.Underline || content.currentSpanStyle.textDecoration?.contains(
-            TextDecoration.combine(
-                listOf(TextDecoration.Underline, TextDecoration.LineThrough)
-            )
-        ) == true
+        content.currentSpanStyle.textDecoration == TextDecoration.Underline ||
+                content.currentSpanStyle.textDecoration?.contains(
+                    TextDecoration.combine(
+                        listOf(
+                            TextDecoration.Underline,
+                            TextDecoration.LineThrough
+                        )
+                    )
+                ) == true
     val lineThroughExpr =
         content.currentSpanStyle.textDecoration == TextDecoration.LineThrough || content.currentSpanStyle.textDecoration?.contains(
             TextDecoration.combine(
                 listOf(TextDecoration.Underline, TextDecoration.LineThrough)
             )
         ) == true
-
 
     Row(
         modifier = Modifier
@@ -81,7 +82,6 @@ fun FormatButtons(
         }
         AnimatedVisibility(
             visible = isFocused, enter = slideInVertically(
-
                 initialOffsetY = { +it }, animationSpec = tween(
                     200, delayMillis = if (!WindowInsets.isImeVisible) 450 else 0
                 )
@@ -134,8 +134,6 @@ fun FormatButtons(
                 ) {
                     component.onEvent(EditNoteAction.SetUnderline)
                 }
-
-
                 IconButton(
                     painter = painterResource(id = CommonDrawables.ic_align_left),
                     expr = content.currentParagraphStyle.textAlign == TextAlign.Start,
@@ -143,7 +141,6 @@ fun FormatButtons(
                 ) {
                     component.onEvent(EditNoteAction.SetAlignStart)
                 }
-
                 IconButton(
                     painter = painterResource(id = CommonDrawables.ic_align_center),
                     expr = content.currentParagraphStyle.textAlign == TextAlign.Center,
@@ -151,7 +148,6 @@ fun FormatButtons(
                 ) {
                     component.onEvent(EditNoteAction.SetAlignCenter)
                 }
-
                 IconButton(
                     painter = painterResource(id = CommonDrawables.ic_align_right),
                     expr = content.currentParagraphStyle.textAlign == TextAlign.End,
@@ -159,13 +155,11 @@ fun FormatButtons(
                 ) {
                     component.onEvent(EditNoteAction.SetAlignEnd)
                 }
-
                 IconButton(imageVector = Icons.Filled.Clear, color = color) {
                     component.onEvent(EditNoteAction.ClearALl)
                 }
             }
         }
-
     }
 }
 
@@ -189,11 +183,8 @@ fun IconButton(
         ),
         shape = RoundedCornerShape(32),
         border = BorderStroke(0.dp, color = Color.Transparent),
-
-        ) {
-        Icon(
-            painter = painter, contentDescription = null
-        )
+    ) {
+        Icon(painter = painter, contentDescription = null)
     }
 }
 
@@ -216,9 +207,6 @@ fun IconButton(
         border = BorderStroke(0.dp, color = Color.Transparent),
         enabled = enabled,
     ) {
-        Icon(
-            imageVector = imageVector, contentDescription = null
-        )
+        Icon(imageVector = imageVector, contentDescription = null)
     }
 }
-

@@ -8,9 +8,8 @@ interface UpdateImageUseCase {
 }
 
 class UpdateImageImpl(
-    val repo: UpdateImageRepo
+    val repository: UpdateImageRepo
 ) : UpdateImageUseCase {
-    override fun invoke(image: Image) {
-        repo(image)
-    }
+    override fun invoke(image: Image) = repository(image)
+
 }

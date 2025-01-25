@@ -9,9 +9,9 @@ interface GetAllImagesByParentIdUseCase {
 }
 
 class GetAllImagesByParentIdImpl(
-    val repo:GetAllImagesByParentIdRepo
+    val repository: GetAllImagesByParentIdRepo
 ) : GetAllImagesByParentIdUseCase {
-    override fun invoke(id: Long): Flow<List<Image>> {
-        return repo(id)
-    }
+
+    override fun invoke(id: Long): Flow<List<Image>> = repository(id)
+
 }

@@ -7,8 +7,7 @@ import com.dracul.images.domain.repository.GetAllImagesByParentIdRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetAllImagesByParentIdRepoImpl: GetAllImagesByParentIdRepo {
-    override fun invoke(id:Long): Flow<List<Image>> {
-        return DatabaseProviderWrap.imageDao.getAllById(id).map { it -> it.map { it.toDomain() } }
-    }
+class GetAllImagesByParentIdRepoImpl : GetAllImagesByParentIdRepo {
+    override fun invoke(id: Long): Flow<List<Image>> =
+        DatabaseProviderWrap.imageDao.getAllById(id).map { it -> it.map { it.toDomain() } }
 }

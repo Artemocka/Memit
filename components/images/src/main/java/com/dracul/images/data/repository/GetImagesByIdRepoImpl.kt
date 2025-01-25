@@ -6,7 +6,6 @@ import com.dracul.images.domain.models.Image
 import com.dracul.images.domain.repository.GetImageByIdRepo
 
 class GetImagesByIdRepoImpl : GetImageByIdRepo {
-    override fun invoke(id: Long): Image {
-        return DatabaseProviderWrap.imageDao.getById(id).toDomain()
-    }
+    override fun invoke(id: Long): Image =
+        DatabaseProviderWrap.imageDao.getById(id).toDomain()
 }

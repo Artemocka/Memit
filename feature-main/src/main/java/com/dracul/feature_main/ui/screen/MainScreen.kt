@@ -46,7 +46,6 @@ import com.dracul.feature_main.ui.components.ReminderBottomSheetWithDelete
 import com.dracul.feature_main.ui.components.TopAppBarWithSearch
 import com.mohamedrejeb.richeditor.model.RichTextState
 
-
 @SuppressLint("NewApi")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -79,6 +78,7 @@ fun MainScreen(
     val showBottomSheet = component.showBottomSheet
     val text by component.searchQuery.collectAsState()
     val showReminderDialog by component.showReminderDialog
+
     LaunchedEffect(Unit) {
         component.events.collect {
             when (it) {
@@ -126,7 +126,6 @@ fun MainScreen(
             }, colorList = component.colorsList
             )
         }
-
         if (showReminderDialog) {
             ReminderBottomSheet(onDismissRequest = {
                 component.onAction(HideReminder)
@@ -136,7 +135,6 @@ fun MainScreen(
                 }
             }
         }
-
         if (component.showReminderDialogWithDelete.value) {
             ReminderBottomSheetWithDelete(onDismissRequest = {
                 component.onAction(HideReminderWithDelete)

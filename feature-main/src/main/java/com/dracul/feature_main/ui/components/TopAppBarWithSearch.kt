@@ -65,7 +65,6 @@ fun TopAppBarWithSearch(
             dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow
         ), label = ""
     )
-
     alpha = ((currentWidth - minWidth) / (maxWidth - minWidth)) * 2.5f
     target = if (showSearchBox) maxWidth else minWidth
 
@@ -79,9 +78,7 @@ fun TopAppBarWithSearch(
                     placeable.place(0, 0)
                 }
             }) {
-
             val (textField) = createRefs()
-
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -101,7 +98,6 @@ fun TopAppBarWithSearch(
                         })
                 }
             }
-
             Row(
                 modifier = Modifier
                     .fillMaxHeight()

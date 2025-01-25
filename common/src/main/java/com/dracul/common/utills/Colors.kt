@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.colorResource
 import com.dracul.common.aliases.CommonColors
 
-
 @Composable
 fun getColor(id: Int): Color {
     return when (id) {
@@ -25,8 +24,6 @@ fun getColor(id: Int): Color {
         else -> MaterialTheme.colorScheme.secondaryContainer
     }
 }
-
-
 
 @Composable
 fun getBlendedColor(id: Int): Color {

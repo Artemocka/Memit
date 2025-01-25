@@ -43,8 +43,8 @@ import java.util.Calendar
 @Composable
 fun ReminderBottomSheet(
     onDismissRequest: () -> Unit,
-    onCreateReminder: (Calendar?) -> Unit,) {
-
+    onCreateReminder: (Calendar?) -> Unit,
+) {
     val currentTime = Calendar.getInstance()
     val notificationPermission = rememberPermissionState(
         permission = Manifest.permission.POST_NOTIFICATIONS
@@ -88,7 +88,6 @@ fun ReminderBottomSheet(
             showAlertPermissionDialog = false
         }
     }
-
     if (showTimePicker) AdvancedTimePicker(onConfirm = {
         date.set(Calendar.HOUR_OF_DAY, it.hour)
         date.set(Calendar.MINUTE, it.minute)
@@ -98,16 +97,18 @@ fun ReminderBottomSheet(
         showTimePicker = false
     }
 
-    if (showDatePicker) DatePickerModal(onDateSelected = {
-        it?.let {
-            currentTime.timeInMillis = it
-            date.set(Calendar.YEAR, currentTime.get(Calendar.YEAR))
-            date.set(Calendar.MONTH, currentTime.get(Calendar.MONTH))
-            date.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH))
-            dateText = formatter.format(date.time)
-        }
-    }) {
-        showDatePicker = false
+    if (showDatePicker) {
+        DatePickerModal(onDateSelected = {
+            it?.let {
+                currentTime.timeInMillis = it
+                date.set(Calendar.YEAR, currentTime.get(Calendar.YEAR))
+                date.set(Calendar.MONTH, currentTime.get(Calendar.MONTH))
+                date.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH))
+                dateText = formatter.format(date.time)
+            }
+        }, onDismiss = {
+            showDatePicker = false
+        })
     }
     ModalBottomSheet(
         modifier = Modifier.windowInsetsPadding(WindowInsets(bottom = 0)),
@@ -139,38 +140,36 @@ fun ReminderBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 12.dp, top = 4.dp).navigationBarsPadding()   ,
-                horizontalArrangement = Arrangement.End
+                    .padding(end = 12.dp, top = 4.dp)
+                    .navigationBarsPadding(), horizontalArrangement = Arrangement.End
             ) {
-
-                Button(onClick = {
-                    if (!notificationPermission.status.isGranted) {
-                        requestPermissionLauncher.launch(
-                            notificationPermission.permission
-                        )
-                    } else {
-                        scope.launch {
-                            modalBottomSheetState.hide()
-                        }.invokeOnCompletion {
-                            onCreateReminder(date)
+                Button(
+                    onClick = {
+                        if (!notificationPermission.status.isGranted) {
+                            requestPermissionLauncher.launch(
+                                notificationPermission.permission
+                            )
+                        } else {
+                            scope.launch {
+                                modalBottomSheetState.hide()
+                            }.invokeOnCompletion {
+                                onCreateReminder(date)
+                            }
                         }
-                    }
-                },
-                    shape = RoundedCornerShape(16.dp)
-                    ) {
+                    }, shape = RoundedCornerShape(16.dp)
+                ) {
                     Text(text = "Create")
                 }
             }
         }
     }
-
 }
 
 
 @Preview
 @Composable
 fun ReminderBottomSheetPreview() {
-    ReminderBottomSheet({},{})
+    ReminderBottomSheet({}, {})
 }
 
 fun normalizeTime(hour: Int, minute: Int): String {

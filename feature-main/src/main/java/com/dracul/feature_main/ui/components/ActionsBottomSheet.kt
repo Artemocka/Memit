@@ -39,7 +39,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,15 +66,12 @@ fun ActionsBottomSheet(
     onColorClick: (CircleColor) -> Unit,
     colorList: State<List<CircleColor>>,
 ) {
-
-
     val modalBottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-
+    val scrollState = rememberScrollState()
     val editLambda = remember<() -> Unit> {
         { onAction(EditNoteModal) }
     }
-
     val shareLambda = remember<() -> Unit> {
         { onAction(ShareNoteModal) }
     }
@@ -94,7 +90,6 @@ fun ActionsBottomSheet(
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
     ) {
-        val scrollState = rememberScrollState()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -104,90 +99,38 @@ fun ActionsBottomSheet(
             repeat(colorList.value.size) {
                 when (it) {
                     0 -> CircleColorItem(
-                        modifier = Modifier.padding(start = 8.dp),
-                        item = colorList.value[it],
-                        onClick = onColorClick
+                        modifier = Modifier.padding(start = 8.dp), item = colorList.value[it], onClick = onColorClick
                     )
 
                     colorList.value.lastIndex -> CircleColorItem(
-                        modifier = Modifier.padding(end = 8.dp),
-                        item = colorList.value[it],
-                        onClick = onColorClick
+                        modifier = Modifier.padding(end = 8.dp), item = colorList.value[it], onClick = onColorClick
                     )
 
                     else -> CircleColorItem(item = colorList.value[it], onClick = onColorClick)
                 }
             }
         }
-        BottomSheetRow(
-            image = Icons.Filled.Edit,
-            text = stringResource(CommonStrings.edit),
-            onClick = {
-                editLambda()
-                scope.launch {
-                    modalBottomSheetState.hide()
-                }.invokeOnCompletion {
-                    onAction(HideBottomSheet)
-
-                }
-            })
-        BottomSheetRow(
-            image = Icons.Filled.Share,
-            text = stringResource(CommonStrings.share),
-            onClick = {
-                shareLambda()
-                scope.launch {
-                    modalBottomSheetState.hide()
-                }.invokeOnCompletion {
-                    onAction(HideBottomSheet)
-
-                }
-            })
-
-            BottomSheetRow(image = Icons.Filled.AddAlert,
-                text = stringResource(CommonStrings.remind),
-                onClick = {
-                    remindLambda()
-                    scope.launch {
-                        modalBottomSheetState.hide()
-                    }.invokeOnCompletion {
-                        onAction(HideBottomSheet)
-                    }
-                })
-
+        BottomSheetRow(image = Icons.Filled.Edit, text = stringResource(CommonStrings.edit), onClick = {
+            editLambda()
+            scope.launch { modalBottomSheetState.hide() }.invokeOnCompletion { onAction(HideBottomSheet) }
+        })
+        BottomSheetRow(image = Icons.Filled.Share, text = stringResource(CommonStrings.share), onClick = {
+            shareLambda()
+            scope.launch { modalBottomSheetState.hide() }.invokeOnCompletion { onAction(HideBottomSheet) }
+        })
+        BottomSheetRow(image = Icons.Filled.AddAlert, text = stringResource(CommonStrings.remind), onClick = {
+            remindLambda()
+            scope.launch { modalBottomSheetState.hide() }.invokeOnCompletion { onAction(HideBottomSheet) }
+        })
         BottomSheetRow(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-            image = Icons.Filled.Delete,
-            text = stringResource(id = CommonStrings.delete),
-            onClick = {
-                deleteLambda()
-                scope.launch {
-                    modalBottomSheetState.hide()
-                }.invokeOnCompletion {
-                    onAction(HideBottomSheet)
-                }
-            })
-    }
-}
-
-@Composable
-fun BottomSheetRow(
-    modifier: Modifier = Modifier, image: Painter, text: String, onClick: () -> Unit
-) {
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .clickable { onClick() }) {
-        Row(modifier = Modifier.padding(vertical = 16.dp)) {
-            Image(
-                image,
-                contentDescription = text,
-                Modifier.padding(start = 16.dp, end = 16.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-            )
-            Text(
-                text = text,
-                color = if (text == stringResource(CommonStrings.delete)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-            )
-        }
+                       image = Icons.Filled.Delete,
+                       text = stringResource(id = CommonStrings.delete),
+                       onClick = {
+                           deleteLambda()
+                           scope.launch { modalBottomSheetState.hide() }.invokeOnCompletion {
+                               onAction(HideBottomSheet)
+                           }
+                       })
     }
 }
 
@@ -205,20 +148,20 @@ fun CircleColorItem(
     }) {
         if (it) {
             Image(painter = painterResource(id = CommonDrawables.ic_selected_circle),
-                colorFilter = ColorFilter.tint(color),
-                contentDescription = "Color circle",
-                modifier = modifier
-                    .padding(horizontal = 4.dp)
-                    .clip(CircleShape)
-                    .noRippleClickable { onClick(item) })
+                  colorFilter = ColorFilter.tint(color),
+                  contentDescription = "Color circle",
+                  modifier = modifier
+                      .padding(horizontal = 4.dp)
+                      .clip(CircleShape)
+                      .noRippleClickable { onClick(item) })
         } else {
             Image(painter = painterResource(id = CommonDrawables.ic_circle),
-                colorFilter = ColorFilter.tint(color),
-                contentDescription = "Color circle",
-                modifier = modifier
-                    .padding(horizontal = 4.dp)
-                    .clip(CircleShape)
-                    .noRippleClickable { onClick(item) })
+                  colorFilter = ColorFilter.tint(color),
+                  contentDescription = "Color circle",
+                  modifier = modifier
+                      .padding(horizontal = 4.dp)
+                      .clip(CircleShape)
+                      .noRippleClickable { onClick(item) })
         }
     }
 }
@@ -240,8 +183,7 @@ fun BottomSheetRow(
                 )
             )
             Text(
-                text = text,
-                color = if (text == "Delete") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                text = text, color = if (text == "Delete") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
             )
         }
     }

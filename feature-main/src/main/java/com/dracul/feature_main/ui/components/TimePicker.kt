@@ -42,24 +42,14 @@ fun AdvancedTimePicker(
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
 ) {
-
     val currentTime = Calendar.getInstance()
-
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
         initialMinute = currentTime.get(Calendar.MINUTE),
         is24Hour = true,
     )
-
-    /** Determines whether the time picker is dial or input */
     var showDial by remember { mutableStateOf(true) }
-
-    /** The icon used for the icon button that switches from dial to input */
-    val toggleIcon = if (showDial) {
-        Icons.Filled.EditNote
-    } else {
-        Icons.Filled.AccessTime
-    }
+    val toggleIcon = if (showDial) Icons.Filled.EditNote else Icons.Filled.AccessTime
 
     AdvancedTimePickerDialog(
         onDismiss = { onDismiss() },
@@ -77,7 +67,6 @@ fun AdvancedTimePicker(
             TimePicker(
                 state = timePickerState,
             )
-
         } else {
             TimeInput(
                 state = timePickerState,
@@ -105,20 +94,16 @@ fun AdvancedTimePickerDialog(
                 .width(IntrinsicSize.Min)
                 .height(IntrinsicSize.Min)
                 .background(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
+                    shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surface
                 ),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 20.dp),
-                    text = title,
-                    style = MaterialTheme.typography.labelMedium
+                        .padding(bottom = 20.dp), text = title, style = MaterialTheme.typography.labelMedium
                 )
                 content()
                 Row(

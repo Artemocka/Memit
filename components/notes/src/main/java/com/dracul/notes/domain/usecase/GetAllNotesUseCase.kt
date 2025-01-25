@@ -9,9 +9,9 @@ interface GetAllNotesUseCase {
 }
 
 class GetAllNotesUseCaseImpl(
-    val repo: GetAllNotesRepo
+    val repository: GetAllNotesRepo
 ) : GetAllNotesUseCase {
-    override fun invoke(): Flow<List<Note>>{
-        return repo()
-    }
+
+    override fun invoke(): Flow<List<Note>> = repository()
+
 }

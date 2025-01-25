@@ -32,7 +32,6 @@ import com.dracul.common.utills.getBlendedCardColor
 import com.dracul.common.utills.getColor
 import com.dracul.common.utills.noRippleClickable
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ColorPickerDialog(currentColor: Int, onDismiss: () -> Unit, setColor: (Int) -> Unit) {
@@ -62,20 +61,20 @@ fun ColorPickerDialog(currentColor: Int, onDismiss: () -> Unit, setColor: (Int) 
                     }, label = "") {
                         if (it) {
                             Image(painter = painterResource(id = CommonDrawables.ic_selected_circle),
-                                colorFilter = ColorFilter.tint(iconColor),
-                                contentDescription = "Color circle",
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .clip(CircleShape)
-                                    .noRippleClickable { setColor(colorId) })
+                                  colorFilter = ColorFilter.tint(iconColor),
+                                  contentDescription = "Color circle",
+                                  modifier = Modifier
+                                      .padding(4.dp)
+                                      .clip(CircleShape)
+                                      .noRippleClickable { setColor(colorId) })
                         } else {
                             Image(painter = painterResource(id = CommonDrawables.ic_circle),
-                                colorFilter = ColorFilter.tint(iconColor),
-                                contentDescription = "Color circle",
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .clip(RoundedCornerShape(32.dp))
-                                    .noRippleClickable { setColor(colorId) })
+                                  colorFilter = ColorFilter.tint(iconColor),
+                                  contentDescription = "Color circle",
+                                  modifier = Modifier
+                                      .padding(4.dp)
+                                      .clip(RoundedCornerShape(32.dp))
+                                      .noRippleClickable { setColor(colorId) })
                         }
                     }
                 }

@@ -87,6 +87,7 @@ fun ItemGrid(
     LaunchedEffect(color) {
         animatedColor.animateTo(color, animationSpec = tween(300, easing = EaseInOutCubic))
     }
+
     Card(
         modifier = modifier
             .fillMaxSize()
@@ -102,26 +103,28 @@ fun ItemGrid(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Top
+                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Top
             ) {
                 item.workerId?.let {
                     val formatter = SimpleDateFormat("dd MMM, hh:mm", java.util.Locale.getDefault())
                     val reminderTimeStamp = item.reminderTimeStamp!!
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier
-                        .padding(end = 4.dp)
-                        .wrapContentWidth()
-                        .height(21.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(
-                            BorderStroke(
-                                1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant
-                            ), RoundedCornerShape(16.dp)
-                        )
-                        .clickable {
-                            onReminderClick(item.id)
-                        }) {
+                    Box(contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .wrapContentWidth()
+                            .height(21.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(
+                                BorderStroke(
+                                    1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant
+                                ), RoundedCornerShape(16.dp)
+                            )
+                            .clickable {
+                                onReminderClick(item.id)
+                            }) {
                         Text(
-
                             modifier = Modifier.padding(horizontal = 6.dp),
                             fontSize = 11.sp,
                             text = formatter.format(Date(item.reminderTimeStamp!!)),
@@ -143,7 +146,6 @@ fun ItemGrid(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp)
-
             ) {
                 if (item.title.isNotEmpty()) {
                     Text(
@@ -169,10 +171,11 @@ fun ItemGrid(
                         .padding(vertical = 8.dp)
                         .height(48.dp)
                 ) {
-                    repeat(images.size) {imageIndex->
+                    repeat(images.size) { imageIndex ->
                         val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL).memoryCacheKey(images[imageIndex].id.hashCode().toString())
-                                .diskCacheKey(images[imageIndex].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
+                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL)
+                                .memoryCacheKey(images[imageIndex].id.hashCode().toString()).diskCacheKey(images[imageIndex].id.hashCode().toString())
+                                .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
                         )
                         Image(
                             modifier = Modifier
@@ -200,8 +203,13 @@ fun ItemGrid(
 @Preview
 @Composable
 fun ItemGridPreview() {
-    val note = Note(0, "Заметка", "Контент", color = 1, pinned = true)
-//    ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { _, _ -> }, onReminderClick = {})
+    Note(
+        0,
+        "Заметка",
+        "Контент",
+        color = 1,
+        pinned = true
+    ) //    ItemGrid(item = note, onItemClick = {}, onItemLongClick = {}, onStarClick = { _, _ -> }, onReminderClick = {})
 }
 
 
@@ -231,9 +239,7 @@ fun ItemGridV1(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Top,
-
                 ) {
-
                 IconButton(
                     onClick = { onStarClick(item.id, item.pinned) }, modifier = Modifier
                         .padding(end = 4.dp)
@@ -273,6 +279,5 @@ fun ItemGridV1(
                 )
             }
         }
-
     }
 }

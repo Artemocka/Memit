@@ -33,3 +33,4 @@ include(
     ":feature-reminder",
     ":feature-viewer",
 )
+include(":components:task")

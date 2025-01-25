@@ -21,7 +21,6 @@ class RootComponent(
         source = navigation, serializer = Configuration.serializer(), initialConfiguration = Configuration.MainScreen, handleBackButton = true, childFactory = ::сhild
     )
 
-
     private fun сhild(
         config: Configuration, context: ComponentContext
     ): Child {

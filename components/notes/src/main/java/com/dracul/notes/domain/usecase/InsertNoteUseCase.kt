@@ -4,13 +4,13 @@ import com.dracul.notes.domain.models.Note
 import com.dracul.notes.domain.repository.InsertNoteRepo
 
 interface InsertNoteUseCase {
-    operator fun invoke(item: Note)
+    operator fun invoke(item: Note): Long
 }
 
 class InsertNoteUseCaseImpl(
-    val repo:InsertNoteRepo
-): InsertNoteUseCase{
-    override fun invoke(item: Note) {
-        repo(item)
-    }
+    val repository: InsertNoteRepo
+) : InsertNoteUseCase {
+
+    override fun invoke(item: Note): Long = repository(item)
+
 }

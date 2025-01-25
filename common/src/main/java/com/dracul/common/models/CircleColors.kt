@@ -7,6 +7,7 @@ import androidx.compose.runtime.Stable
 data class CircleColor(val color: Int, val selected: Boolean = false)
 
 class CircleColorList() {
+
     private val list = listOf(
         CircleColor(0),
         CircleColor(1),
@@ -22,20 +23,17 @@ class CircleColorList() {
         CircleColor(11),
     )
 
-    fun getColors(): List<CircleColor> {
-        return list
-    }
+    fun getColors(): List<CircleColor> = list
 
-    fun getSelected(noteColor: CircleColor): List<CircleColor> {
-        return list.map {
-            if (it.color == noteColor.color) it.copy(selected = true)
-            else it
+    fun getSelected(noteColor: CircleColor): List<CircleColor> =
+        list.map {
+            if (it.color == noteColor.color) it.copy(selected = true) else it
         }.toList()
-    }
-    fun getSelected(noteColor: Int): List<CircleColor> {
-        return list.map {
-            if (it.color == noteColor) it.copy(selected = true)
-            else it
+
+
+    fun getSelected(noteColor: Int): List<CircleColor> =
+        list.map {
+            if (it.color == noteColor) it.copy(selected = true) else it
         }.toList()
-    }
+
 }

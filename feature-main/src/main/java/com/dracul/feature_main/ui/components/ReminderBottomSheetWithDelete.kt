@@ -45,8 +45,7 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ReminderBottomSheetWithDelete(
-    onDismissRequest: () -> Unit,
-    onCreateReminder: (Calendar) -> Unit, onDeleteReminder: () -> Unit
+    onDismissRequest: () -> Unit, onCreateReminder: (Calendar) -> Unit, onDeleteReminder: () -> Unit
 ) {
 
     val currentTime = Calendar.getInstance()
@@ -92,26 +91,28 @@ fun ReminderBottomSheetWithDelete(
             showAlertPermissionDialog = false
         }
     }
-
-    if (showTimePicker) AdvancedTimePicker(onConfirm = {
-        date.set(Calendar.HOUR_OF_DAY, it.hour)
-        date.set(Calendar.MINUTE, it.minute)
-        timeText = normalizeTime(it.hour, it.minute)
-        showTimePicker = false
-    }) {
-        showTimePicker = false
-    }
-
-    if (showDatePicker) DatePickerModal(onDateSelected = {
-        it?.let {
-            currentTime.timeInMillis = it
-            date.set(Calendar.YEAR, currentTime.get(Calendar.YEAR))
-            date.set(Calendar.MONTH, currentTime.get(Calendar.MONTH))
-            date.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH))
-            dateText = formatter.format(date.time)
+    if (showTimePicker) {
+        AdvancedTimePicker(onConfirm = {
+            date.set(Calendar.HOUR_OF_DAY, it.hour)
+            date.set(Calendar.MINUTE, it.minute)
+            timeText = normalizeTime(it.hour, it.minute)
+            showTimePicker = false
+        }) {
+            showTimePicker = false
         }
-    }) {
-        showDatePicker = false
+    }
+    if (showDatePicker) {
+        DatePickerModal(onDateSelected = {
+            it?.let {
+                currentTime.timeInMillis = it
+                date.set(Calendar.YEAR, currentTime.get(Calendar.YEAR))
+                date.set(Calendar.MONTH, currentTime.get(Calendar.MONTH))
+                date.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH))
+                dateText = formatter.format(date.time)
+            }
+        }) {
+            showDatePicker = false
+        }
     }
     ModalBottomSheet(
         modifier = Modifier.windowInsetsPadding(WindowInsets(bottom = 0)),
@@ -149,44 +150,39 @@ fun ReminderBottomSheetWithDelete(
 
                 ) {
                 Button(
-                    modifier = Modifier.padding(end = 8.dp),
-                    onClick = {
+                    modifier = Modifier.padding(end = 8.dp), onClick = {
                         scope.launch {
                             modalBottomSheetState.hide()
                         }.invokeOnCompletion {
                             onDeleteReminder()
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    ),
-                    shape = RoundedCornerShape(16.dp)
+                    }, colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError
+                    ), shape = RoundedCornerShape(16.dp)
 
                 ) {
                     Text(text = stringResource(id = CommonStrings.delete))
                 }
-                Button(onClick = {
-                    if (!notificationPermission.status.isGranted) {
-                        requestPermissionLauncher.launch(
-                            notificationPermission.permission
-                        )
-                    } else {
-                        scope.launch {
-                            modalBottomSheetState.hide()
-                        }.invokeOnCompletion {
-                            onCreateReminder(date)
+                Button(
+                    onClick = {
+                        if (!notificationPermission.status.isGranted) {
+                            requestPermissionLauncher.launch(
+                                notificationPermission.permission
+                            )
+                        } else {
+                            scope.launch {
+                                modalBottomSheetState.hide()
+                            }.invokeOnCompletion {
+                                onCreateReminder(date)
+                            }
                         }
-                    }
-                },
-                    shape = RoundedCornerShape(16.dp)
-                    ) {
+                    }, shape = RoundedCornerShape(16.dp)
+                ) {
                     Text(text = stringResource(id = CommonStrings.create))
                 }
             }
         }
     }
-
 }
 
 

@@ -33,18 +33,17 @@ class ReminderWorker(context: Context, workerParams: WorkerParameters) :
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(NOTE_ID, noteId)
         }
-
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             applicationContext,
             0,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
         val builder = NotificationCompat.Builder(applicationContext, "reminderChannel")
             .setSmallIcon(CommonDrawables.notification_icon).setContentTitle("Reminder")
             .setContentText(message).setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
 
         with(NotificationManagerCompat.from(applicationContext)) {
             if (ActivityCompat.checkSelfPermission(

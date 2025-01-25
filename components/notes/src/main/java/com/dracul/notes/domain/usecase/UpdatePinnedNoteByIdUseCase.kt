@@ -9,7 +9,7 @@ interface UpdatePinnedNoteByIdUseCase {
 class UpdatePinnedNoteByIdUseCaseImpl(
     val repo: UpdatePinnedNoteByIdRepo
 ) : UpdatePinnedNoteByIdUseCase {
-    override fun invoke(id: Long, pinned: Boolean) {
-        repo(id, pinned)
-    }
+
+    override fun invoke(id: Long, pinned: Boolean) = repo(id, pinned)
+
 }

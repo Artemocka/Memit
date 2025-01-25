@@ -102,30 +102,32 @@ fun ViewerScreen(
     val widthDP by remember { mutableStateOf(((configuration.screenWidthDp / 2) - 44).dp) }
     val snapPosition = object : SnapPosition {
         override fun position(
-            layoutSize: Int,
-            itemSize: Int,
-            beforeContentPadding: Int,
-            afterContentPadding: Int,
-            itemIndex: Int,
-            itemCount: Int
+            layoutSize: Int, itemSize: Int, beforeContentPadding: Int, afterContentPadding: Int, itemIndex: Int, itemCount: Int
         ): Int {
             return (layoutSize / 2) - (itemSize / 2)
         }
     }
-    val snappingLayout = remember(lazyListState) {SnapLayoutInfoProvider(lazyListState, snapPosition) }
+    val snappingLayout = remember(lazyListState) { SnapLayoutInfoProvider(lazyListState, snapPosition) }
     val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
-
     val hapticFeedback = LocalHapticFeedback.current
+
     LaunchedEffect(component.state.currentImage) {
-        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-        pagerState.animateScrollToPage(component.state.currentImage)
-        job?.cancel()
-        job = launch {
-            ignoreSlider = true
-            lazyListState.animateScrollToItemCenter(component.state.currentImage + 1)
+        if (pagerState.pageCount > 0 && component.state.currentImage != pagerState.targetPage) {
+            launch {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                pagerState.animateScrollToPage(component.state.currentImage)
+            }
         }
-        job.invokeOnCompletion {
-            ignoreSlider = false
+    }
+    LaunchedEffect(component.state.currentSliderImage) {
+        if (lazyListState.layoutInfo.totalItemsCount > 0) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+            job?.cancel()
+            job = launch {
+                ignoreSlider = true
+                lazyListState.animateScrollToItemCenter(component.state.currentSliderImage + 1)
+            }
+            job!!.invokeOnCompletion { ignoreSlider = false }
         }
     }
     LaunchedEffect(lazyListState.isScrollInProgress) {
@@ -138,10 +140,18 @@ fun ViewerScreen(
         component.onAction(ViewerAction.PagerTargetImage(pagerState.targetPage))
     }
     LaunchedEffect(centeredIndex) {
-        if (!ignoreSlider)
-            component.onAction(ViewerAction.SlideImage(centeredIndex - 1, pagerState.currentPage, pagerState.targetPage))
+        component.onAction(ViewerAction.SlideImage(centeredIndex - 1, pagerState.currentPage, pagerState.targetPage))
     }
     LaunchedEffect(component.state.showUi) {
+        if (lazyListState.layoutInfo.totalItemsCount > 0) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+            job?.cancel()
+            job = launch {
+                ignoreSlider = true
+                lazyListState.animateScrollToItemCenter(component.state.currentImage + 1)
+            }
+            job.invokeOnCompletion { ignoreSlider = false }
+        }
         systemUiController.isSystemBarsVisible = component.state.showUi
     }
     DisposableEffect(Unit) {
@@ -152,37 +162,28 @@ fun ViewerScreen(
 
     Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
         paddingValues
-
         HorizontalPager(
             userScrollEnabled = true, state = pagerState
         ) {
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL).memoryCacheKey(images[it].id.hashCode().toString()).diskCacheKey(images[it].id.hashCode().toString())
-                    .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build(),
+                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL).memoryCacheKey(images[it].id.hashCode().toString())
+                    .diskCacheKey(images[it].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
+                    .build(),
             )
-            Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zoomable(
-                        zoomState = rememberZoomState(),
-                        onTap = {
-                            component.onAction(ViewerAction.Click)
-                        }
-                    ), painter = painter, contentDescription = null
+            Image(modifier = Modifier
+                .fillMaxSize()
+                .zoomable(zoomState = rememberZoomState(), onTap = {
+                    component.onAction(ViewerAction.Click)
+                }), painter = painter, contentDescription = null
             )
         }
-
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = component.state.showUi,
-                enter = slideInVertically(
+                modifier = Modifier.fillMaxWidth(), visible = component.state.showUi, enter = slideInVertically(
                     initialOffsetY = { +it }, animationSpec = tween(300)
-                ) + fadeIn(tween(300)),
-                exit = slideOutVertically(
+                ) + fadeIn(tween(300)), exit = slideOutVertically(
                     targetOffsetY = { +it }, animationSpec = tween(300)
                 ) + fadeOut(tween(300))
             ) {
@@ -200,26 +201,27 @@ fun ViewerScreen(
                         contentType = { 0 },
                     ) { imageIndex ->
                         val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL).memoryCacheKey(images[imageIndex].id.hashCode().toString())
-                                .diskCacheKey(images[imageIndex].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
+                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL)
+                                .memoryCacheKey(images[imageIndex].id.hashCode().toString()).diskCacheKey(images[imageIndex].id.hashCode().toString())
+                                .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
                         )
-                        Image(
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .size(80.dp)
-                                .clickable { component.onAction(ViewerAction.SetCurrentImage(imageIndex)) }
-                                .border(2.dp, if (imageIndex == component.state.currentImage) MaterialTheme.colorScheme.secondary else Color.Transparent, RoundedCornerShape(16.dp))
-                                .clip(RoundedCornerShape(8.dp)), painter = painter, contentDescription = null, contentScale = ContentScale.FillBounds
-                        )
+                        Image(modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .size(80.dp)
+                            .clickable { component.onAction(ViewerAction.SetCurrentImage(imageIndex)) }
+                            .border(
+                                2.dp,
+                                if (imageIndex == component.state.currentImage) MaterialTheme.colorScheme.secondary else Color.Transparent,
+                                RoundedCornerShape(16.dp)
+                            )
+                            .clip(RoundedCornerShape(8.dp)), painter = painter, contentDescription = null, contentScale = ContentScale.FillBounds)
                     }
                     item { Spacer(modifier = Modifier.width(widthDP)) }
                 }
             }
         }
     }
-
-
 }
 
 suspend fun LazyListState.animateScrollToItemCenter(index: Int) {

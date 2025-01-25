@@ -29,8 +29,7 @@ fun AlertPermissionDialog(
         },
         text = {
             Text(
-                "The notification is important for this app. Please grant the permission.",
-                fontSize = 16.sp
+                "The notification is important for this app. Please grant the permission.", fontSize = 16.sp
             )
         },
         confirmButton = {
@@ -41,8 +40,7 @@ fun AlertPermissionDialog(
                     }
                 } else {
                     Intent(
-                        Settings.ACTION_APPLICATION_SETTINGS,
-                        Uri.fromParts("package", context.packageName, null)
+                        Settings.ACTION_APPLICATION_SETTINGS, Uri.fromParts("package", context.packageName, null)
                     )
                 }
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

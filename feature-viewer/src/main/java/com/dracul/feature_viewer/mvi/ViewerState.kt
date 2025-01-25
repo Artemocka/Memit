@@ -8,13 +8,10 @@ import androidx.compose.runtime.setValue
 class ViewerState(
     showUi: Boolean,
     currentImage: Int,
-//    event: ViewerEvent,
-    isPagerScrollInProgress: Boolean,
-    isSliderScrollInProgress: Boolean,
 ) {
     var showUi by mutableStateOf(showUi)
     var currentImage by mutableIntStateOf(currentImage)
-//    var event by mutableStateOf(event)
+    var currentSliderImage by mutableIntStateOf(currentImage)
     var isPagerScrollInProgress by mutableStateOf(false)
     var isSliderScrollInProgress by mutableStateOf(false)
 }

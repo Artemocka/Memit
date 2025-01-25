@@ -4,7 +4,7 @@ import org.koin.dsl.module
 import kotlin.reflect.KClass
 
 
-fun reminderModule(clazz: KClass<*>) =   module {
+fun reminderModule(clazz: KClass<*>) = module {
     single<MProvider> {
         MProvider(clazz)
     }

@@ -36,7 +36,8 @@ class MainComponent(
     componentContext: ComponentContext,
     private val onEditNote: (id: Long?) -> Unit,
     private val onViewer: (parentId: Long, index: Int) -> Unit,
-    ) : ComponentContext by componentContext, KoinComponent {
+) : ComponentContext by componentContext, KoinComponent {
+
     val deleteNoteByIdUseCase by inject<DeleteNoteByIdUseCase>()
     val getNoteByIdUseCase by inject<GetNoteByIdUseCase>()
     val getAllNotesUseCase by inject<GetAllNotesUseCase>()
@@ -45,7 +46,6 @@ class MainComponent(
     val updateWorkerByIdUseCase by inject<UpdateWorkerByIdUseCase>()
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
     private var circleColorList: CircleColorList = CircleColorList()
     private val _showBottomSheet = mutableStateOf(false)
     private val _events = MutableSharedFlow<MainEvent>(1)
@@ -55,6 +55,7 @@ class MainComponent(
     private var _searchQuery = MutableStateFlow("")
     private var _showReminderDialog = mutableStateOf(false)
     private var _showReminderDialogWithDelete = mutableStateOf(false)
+
     var showReminderDialog: State<Boolean> = _showReminderDialog
     var showReminderDialogWithDelete: State<Boolean> = _showReminderDialogWithDelete
     var searchQuery = _searchQuery.asStateFlow()
@@ -76,7 +77,6 @@ class MainComponent(
         }
     }
 
-
     fun onAction(action: MainAction) {
         when (action) {
             MainAction.CreateNote -> {
@@ -95,9 +95,8 @@ class MainComponent(
                 }
             }
 
-            is MainAction.DeleteNote -> {
-                deleteNoteByIdUseCase(action.id)
-            }
+            is MainAction.DeleteNote -> deleteNoteByIdUseCase(action.id)
+
 
             is MainAction.ShowBottomSheet -> {
                 selectedItemId = action.id
@@ -112,11 +111,7 @@ class MainComponent(
                 _showBottomSheet.value = true
             }
 
-            MainAction.DeleteNoteModal -> {
-                selectedItemId?.let { id ->
-                    deleteNoteByIdUseCase(id)
-                }
-            }
+            MainAction.DeleteNoteModal -> selectedItemId?.let { id -> deleteNoteByIdUseCase(id) }
 
             is MainAction.ShareNoteModal -> {
                 selectedItemId?.let { id ->
@@ -126,15 +121,9 @@ class MainComponent(
                 }
             }
 
-            MainAction.HideBottomSheet -> {
-                _showBottomSheet.value = false
-            }
+            MainAction.HideBottomSheet -> _showBottomSheet.value = false
 
-            MainAction.EditNoteModal -> {
-                selectedItemId?.let {
-                    onEditNote(it)
-                }
-            }
+            MainAction.EditNoteModal -> selectedItemId?.let { onEditNote(it) }
 
             is MainAction.SetNoteColorModal -> {
                 _colorsList.value = circleColorList.getSelected(action.color)
@@ -144,11 +133,10 @@ class MainComponent(
                 }
             }
 
-            is MainAction.SetStarred -> {
-                updatePinnedNoteByIdUseCase(action.id, !action.pinned)
-            }
+            is MainAction.SetStarred -> updatePinnedNoteByIdUseCase(action.id, !action.pinned)
 
             is MainAction.SetSearchQuery -> _searchQuery.value = action.query
+
             MainAction.ShowSearchBar -> {
                 _showSearchBar.value = !_showSearchBar.value
                 if (!_showSearchBar.value) _searchQuery.value = ""
@@ -166,8 +154,7 @@ class MainComponent(
                 _showReminderDialog.value = false
                 _showReminderDialogWithDelete.value = false
                 val note = selectedItemId?.let { getNoteByIdUseCase(it) }!!
-                val inputData = Data.Builder().putString("MESSAGE",
-                    note.content.let { RichTextState().setHtml(it).annotatedString.text })
+                val inputData = Data.Builder().putString("MESSAGE", note.content.let { RichTextState().setHtml(it).annotatedString.text })
                     .putLong("NOTE_ID", note.id).build()
                 val currentTimeInMillis = System.currentTimeMillis()
 
@@ -180,6 +167,7 @@ class MainComponent(
             }
 
             MainAction.HideReminderWithDelete -> _showReminderDialogWithDelete.value = false
+
             is MainAction.ShowReminderWithDelete -> {
                 selectedItemId = action.id
                 _showReminderDialogWithDelete.value = true

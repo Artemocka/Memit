@@ -19,6 +19,7 @@ import com.dracul.database.notes.NoteEntity
 )
 @TypeConverters(UriConverter::class)
 abstract class DatabaseProvider : RoomDatabase() {
+
     abstract val dao: NoteDao
     abstract val imageDao: ImgageDao
 

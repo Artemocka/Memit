@@ -8,9 +8,10 @@ interface DeleteImageUseCase {
 }
 
 class DeleteImageImpl(
-    val repo:DeleteImageRepo
+    val repository: DeleteImageRepo
 ) : DeleteImageUseCase {
-    override fun invoke(image: Image) {
-        repo(image)
-    }
+
+    override fun invoke(image: Image) = repository(image)
+
+
 }

@@ -1,15 +1,16 @@
 package com.dracul.images.domain.usecase
 
+import com.dracul.images.domain.models.Image
 import com.dracul.images.domain.repository.GetImageByIdRepo
 
 interface GetImageByIdUseCase {
-    operator fun invoke(id: Long)
+    operator fun invoke(id: Long): Image
 }
 
 class GetImageByIdImpl(
-    val repo:GetImageByIdRepo
+    val repository: GetImageByIdRepo
 ) : GetImageByIdUseCase {
-    override fun invoke(id: Long) {
-        repo(id)
-    }
+
+    override fun invoke(id: Long) = repository(id)
+
 }

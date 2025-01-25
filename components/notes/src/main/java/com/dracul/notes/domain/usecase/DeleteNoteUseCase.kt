@@ -8,9 +8,9 @@ interface DeleteNoteUseCase {
 }
 
 class DeleteNoteUseCaseImpl(
-    val repo: DeleteNoteRepo
+    val repository: DeleteNoteRepo
 ) : DeleteNoteUseCase {
-    override fun invoke(item: Note) {
-        repo(item)
-    }
+
+    override fun invoke(item: Note) = repository(item)
+
 }

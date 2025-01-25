@@ -61,7 +61,6 @@ fun ImageRow(
                     .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
                     .build()
             )
-
             Box(
                 modifier = Modifier
                     .animateItem(fadeInSpec = null, fadeOutSpec = null)

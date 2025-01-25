@@ -31,7 +31,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            isDebuggable = true
+            isDebuggable = false
             applicationIdSuffix = ".debug"
         }
     }

@@ -6,7 +6,6 @@ import com.dracul.images.domain.models.Image
 import com.dracul.images.domain.repository.UpdateImageRepo
 
 class UpdateImageRepoImpl : UpdateImageRepo {
-    override fun invoke(image: Image) {
+    override fun invoke(image: Image) =
         DatabaseProviderWrap.imageDao.update(image.toEntity())
-    }
 }
