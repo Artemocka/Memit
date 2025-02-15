@@ -18,34 +18,55 @@ class RootComponent(
     private val navigation = StackNavigation<Configuration>()
 
     val childStack = childStack(
-        source = navigation, serializer = Configuration.serializer(), initialConfiguration = Configuration.MainScreen, handleBackButton = true, childFactory = ::сhild
+        source = navigation,
+        serializer = Configuration.serializer(),
+        initialConfiguration = Configuration.MainScreen,
+        handleBackButton = true,
+        childFactory = ::child
     )
 
-    private fun сhild(
+    private fun child(
         config: Configuration, context: ComponentContext
-    ): Child {
-        return when (config) {
+    ): Child =
+        when (config) {
             is Configuration.MainScreen -> Child.MainScreen(
-                MainComponent(componentContext = context,
+                MainComponent(
+                    componentContext = context,
                     onEditNote = { navigation.pushNew(Configuration.EditNote(it)) },
-                    onViewer = { parentId: Long, index: Int -> navigation.pushNew(Configuration.ViewerScreen(parentId = parentId, index = index)) })
+                    onViewer = { parentId: Long, index: Int ->
+                        navigation.pushNew(
+                            Configuration.ViewerScreen(
+                                parentId = parentId, index = index
+                            )
+                        )
+                    }
+                )
             )
 
-            is Configuration.EditNote -> Child.EditNote(EditNoteComponent(id = config.id, componentContext = context, onGoBack = { onBackClicked() }, onViewer = { parentId, index ->
-                navigation.pushNew(Configuration.ViewerScreen(parentId, index))
-            }))
+            is Configuration.EditNote -> Child.EditNote(
+                EditNoteComponent(
+                    id = config.id,
+                    componentContext = context,
+                    onGoBack = { onBackClicked() },
+                    onViewer = { parentId, index ->
+                        navigation.pushNew(Configuration.ViewerScreen(parentId, index))
+                    }
+                )
+            )
 
-            is Configuration.ViewerScreen -> Child.ViewerScreen(ViewerComponent(componentContext = context, parentId = config.parentId, index = config.index, onGoBack = { navigation.pop() }))
+            is Configuration.ViewerScreen -> Child.ViewerScreen(
+                ViewerComponent(
+                    componentContext = context,
+                    parentId = config.parentId,
+                    onGoBack = { navigation.pop() },
+                    index = config.index
+                )
+            )
         }
-    }
 
-    fun onDeepLink(initialItemId: Long) {
-        navigation.pushNew(Configuration.EditNote(id = initialItemId))
-    }
+    fun onDeepLink(initialItemId: Long) = navigation.pushNew(Configuration.EditNote(id = initialItemId))
 
-    fun onBackClicked() {
-        navigation.pop()
-    }
+    fun onBackClicked() = navigation.pop()
 
     sealed class Child {
         data class MainScreen(val component: MainComponent) : Child()

@@ -9,8 +9,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -54,6 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
+import com.dracul.common.utills.debug
 import com.dracul.feature_viewer.mvi.ViewerAction
 import com.dracul.feature_viewer.nav_component.ViewerComponent
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -81,36 +80,35 @@ fun ViewerScreen(
         },
         initialPage = index,
     )
+    var firstTime by remember { mutableStateOf(true) }
     val centeredIndex by remember {
         derivedStateOf {
             val visibleItems = lazyListState.layoutInfo.visibleItemsInfo
             if (visibleItems.isNotEmpty()) {
-                val centerOffset = lazyListState.layoutInfo.viewportEndOffset / 2
-                val centeredItemIndex = visibleItems.minByOrNull {
-                    val itemCenter = it.offset + it.size / 2
-                    abs(itemCenter - centerOffset)
-                }?.index
-
-                centeredItemIndex ?: -1
+                val viewportCenter = lazyListState.layoutInfo.viewportEndOffset / 2
+                visibleItems.minByOrNull {
+                    abs(it.offset + it.size / 2 - viewportCenter)
+                }?.index ?: 0
             } else {
-                -1
+                0
             }
         }
     }
     var ignoreSlider by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val widthDP by remember { mutableStateOf(((configuration.screenWidthDp / 2) - 44).dp) }
-    val snapPosition = object : SnapPosition {
-        override fun position(
-            layoutSize: Int, itemSize: Int, beforeContentPadding: Int, afterContentPadding: Int, itemIndex: Int, itemCount: Int
-        ): Int {
-            return (layoutSize / 2) - (itemSize / 2)
-        }
-    }
-    val snappingLayout = remember(lazyListState) { SnapLayoutInfoProvider(lazyListState, snapPosition) }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
+    val flingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
     val hapticFeedback = LocalHapticFeedback.current
 
+    LaunchedEffect(Unit) {
+        debug("firstTime: $firstTime")
+        job = launch {
+            lazyListState.scrollToItem(component.state.currentSliderImage + 1)
+        }
+        job?.invokeOnCompletion {
+            firstTime = false
+        }
+    }
     LaunchedEffect(component.state.currentImage) {
         if (pagerState.pageCount > 0 && component.state.currentImage != pagerState.targetPage) {
             launch {
@@ -140,7 +138,9 @@ fun ViewerScreen(
         component.onAction(ViewerAction.PagerTargetImage(pagerState.targetPage))
     }
     LaunchedEffect(centeredIndex) {
-        component.onAction(ViewerAction.SlideImage(centeredIndex - 1, pagerState.currentPage, pagerState.targetPage))
+        debug("firstTime: $firstTime")
+        if (!firstTime)
+            component.onAction(ViewerAction.SlideImage(centeredIndex - 1, pagerState.currentPage, pagerState.targetPage))
     }
     LaunchedEffect(component.state.showUi) {
         if (lazyListState.layoutInfo.totalItemsCount > 0) {
@@ -170,11 +170,12 @@ fun ViewerScreen(
                     .diskCacheKey(images[it].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
                     .build(),
             )
-            Image(modifier = Modifier
-                .fillMaxSize()
-                .zoomable(zoomState = rememberZoomState(), onTap = {
-                    component.onAction(ViewerAction.Click)
-                }), painter = painter, contentDescription = null
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zoomable(zoomState = rememberZoomState(), onTap = {
+                        component.onAction(ViewerAction.Click)
+                    }), painter = painter, contentDescription = null
             )
         }
         Box(
@@ -207,7 +208,7 @@ fun ViewerScreen(
                         )
                         Image(modifier = Modifier
                             .padding(horizontal = 4.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(16.dp))
                             .size(80.dp)
                             .clickable { component.onAction(ViewerAction.SetCurrentImage(imageIndex)) }
                             .border(
