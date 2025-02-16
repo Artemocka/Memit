@@ -9,14 +9,19 @@ import coil.util.DebugLogger
 import com.dracul.feature_reminder.worker.di.reminderModule
 import com.dracul.images.di.imagesModule
 import com.dracul.notes.di.notesModule
+import com.dracul.task.di.subTaskModule
+import com.dracul.task.di.taskModule
 import org.koin.core.context.startKoin
 
 
 class App : Application(), ImageLoaderFactory {
     val koin = startKoin {
         modules(
-            notesModule,
+            taskModule,
             imagesModule,
+            taskModule,
+            subTaskModule,
+            notesModule,
             reminderModule(MainActivity::class)
         )
     }

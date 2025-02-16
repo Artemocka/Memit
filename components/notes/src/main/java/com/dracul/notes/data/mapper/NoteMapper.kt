@@ -14,7 +14,7 @@ internal fun NoteEntity.toDomain(): Note =
         reminderTimeStamp = reminderTimeStamp
     )
 
-internal fun Note.toEntity(): NoteEntity =
+internal fun Note.toData(): NoteEntity =
     NoteEntity(
         id = id,
         title = title,

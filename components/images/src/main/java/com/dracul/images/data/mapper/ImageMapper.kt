@@ -10,7 +10,7 @@ internal fun ImageEntity.toDomain(): Image =
         uri = uri
     )
 
-internal fun Image.toEntity(): ImageEntity =
+internal fun Image.toData(): ImageEntity =
     ImageEntity(
         id = id,
         parentId = parentId,

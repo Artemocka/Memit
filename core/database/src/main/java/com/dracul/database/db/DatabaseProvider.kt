@@ -8,11 +8,17 @@ import com.dracul.database.images.ImageEntity
 import com.dracul.database.images.ImgageDao
 import com.dracul.database.notes.NoteDao
 import com.dracul.database.notes.NoteEntity
+import com.dracul.database.sub_tasks.SubTaskDao
+import com.dracul.database.sub_tasks.SubTaskEntity
+import com.dracul.database.tasks.TaskDao
+import com.dracul.database.tasks.TaskEntity
 
 @Database(
     entities = [
         NoteEntity::class,
-        ImageEntity::class
+        ImageEntity::class,
+        TaskEntity::class,
+        SubTaskEntity::class,
        ],
     version = DatabaseProvider.VERSION,
     exportSchema = false,
@@ -22,8 +28,10 @@ abstract class DatabaseProvider : RoomDatabase() {
 
     abstract val dao: NoteDao
     abstract val imageDao: ImgageDao
+    abstract val taskDao: TaskDao
+    abstract val subTaskDao: SubTaskDao
 
     companion object {
-        const val VERSION = 6
+        const val VERSION = 7
     }
 }
