@@ -30,14 +30,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -110,7 +111,7 @@ fun ViewerScreen(
         }
     }
     LaunchedEffect(component.state.currentImage) {
-        if (pagerState.pageCount > 0 && component.state.currentImage != pagerState.targetPage) {
+        if (pagerState.pageCount >= component.state.currentImage && component.state.currentImage != pagerState.targetPage) {
             launch {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 pagerState.animateScrollToPage(component.state.currentImage)
@@ -140,7 +141,13 @@ fun ViewerScreen(
     LaunchedEffect(centeredIndex) {
         debug("firstTime: $firstTime")
         if (!firstTime)
-            component.onAction(ViewerAction.SlideImage(centeredIndex - 1, pagerState.currentPage, pagerState.targetPage))
+            component.onAction(
+                ViewerAction.SlideImage(
+                    centeredIndex - 1,
+                    pagerState.currentPage,
+                    pagerState.targetPage
+                )
+            )
     }
     LaunchedEffect(component.state.showUi) {
         if (lazyListState.layoutInfo.totalItemsCount > 0) {
@@ -150,7 +157,7 @@ fun ViewerScreen(
                 ignoreSlider = true
                 lazyListState.animateScrollToItemCenter(component.state.currentImage + 1)
             }
-            job.invokeOnCompletion { ignoreSlider = false }
+            job?.invokeOnCompletion { ignoreSlider = false }
         }
         systemUiController.isSystemBarsVisible = component.state.showUi
     }
@@ -166,8 +173,10 @@ fun ViewerScreen(
             userScrollEnabled = true, state = pagerState
         ) {
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL).memoryCacheKey(images[it].id.hashCode().toString())
-                    .diskCacheKey(images[it].id.hashCode().toString()).diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
+                model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL)
+                    .memoryCacheKey(images[it].id.hashCode().toString())
+                    .diskCacheKey(images[it].id.hashCode().toString())
+                    .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
                     .build(),
             )
             Image(
@@ -182,9 +191,12 @@ fun ViewerScreen(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(), visible = component.state.showUi, enter = slideInVertically(
+                modifier = Modifier.fillMaxWidth(),
+                visible = component.state.showUi,
+                enter = slideInVertically(
                     initialOffsetY = { +it }, animationSpec = tween(300)
-                ) + fadeIn(tween(300)), exit = slideOutVertically(
+                ) + fadeIn(tween(300)),
+                exit = slideOutVertically(
                     targetOffsetY = { +it }, animationSpec = tween(300)
                 ) + fadeOut(tween(300))
             ) {
@@ -202,21 +214,34 @@ fun ViewerScreen(
                         contentType = { 0 },
                     ) { imageIndex ->
                         val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(context).data(images[imageIndex].uri).size(Size.ORIGINAL)
-                                .memoryCacheKey(images[imageIndex].id.hashCode().toString()).diskCacheKey(images[imageIndex].id.hashCode().toString())
-                                .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED).build()
+                            model = ImageRequest.Builder(context).data(images[imageIndex].uri)
+                                .size(Size.ORIGINAL)
+                                .memoryCacheKey(images[imageIndex].id.hashCode().toString())
+                                .diskCacheKey(images[imageIndex].id.hashCode().toString())
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .memoryCachePolicy(CachePolicy.ENABLED).build()
                         )
-                        Image(modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .size(80.dp)
-                            .clickable { component.onAction(ViewerAction.SetCurrentImage(imageIndex)) }
-                            .border(
-                                2.dp,
-                                if (imageIndex == component.state.currentImage) MaterialTheme.colorScheme.secondary else Color.Transparent,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .clip(RoundedCornerShape(8.dp)), painter = painter, contentDescription = null, contentScale = ContentScale.FillBounds)
+                        Image(
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .size(80.dp)
+                                .clickable {
+                                    component.onAction(
+                                        ViewerAction.SetCurrentImage(
+                                            imageIndex
+                                        )
+                                    )
+                                }
+                                .border(
+                                    2.dp,
+                                    if (imageIndex == component.state.currentImage) MaterialTheme.colorScheme.secondary else Color.Transparent,
+                                    RoundedCornerShape(16.dp)
+                                )
+                                .clip(RoundedCornerShape(8.dp)),
+                            painter = painter,
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds)
                     }
                     item { Spacer(modifier = Modifier.width(widthDP)) }
                 }
