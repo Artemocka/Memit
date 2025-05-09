@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 class TaskEntity(
     @PrimaryKey(autoGenerate = true)
-    var id: Int,
+    var id: Long,
     var title: String,
     val color: Int,
     val pinned: Boolean = false,

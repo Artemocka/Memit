@@ -28,9 +28,9 @@ include(
     ":components:notes",
     ":core:database",
     ":core:notification",
-    ":feature-edit",
-    ":feature-main",
-    ":feature-reminder",
-    ":feature-viewer",
+    ":feature:edit",
+    ":feature:main",
+    ":feature:reminder",
+    ":feature:viewer",
+    ":components:task",
 )
-include(":components:task")

@@ -45,16 +45,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.dracul.common.utills.debug
-import com.dracul.feature_viewer.mvi.ViewerAction
+import com.dracul.feature_viewer.mvi.ViewerIntent
 import com.dracul.feature_viewer.nav_component.ViewerComponent
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Job
@@ -96,13 +96,12 @@ fun ViewerScreen(
         }
     }
     var ignoreSlider by remember { mutableStateOf(false) }
-    val configuration = LocalConfiguration.current
-    val widthDP by remember { mutableStateOf(((configuration.screenWidthDp / 2) - 44).dp) }
+    val configuration = LocalWindowInfo.current
+    val widthDP by remember { mutableStateOf(((configuration.containerSize.width / 2) - 44).dp) }
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
     val hapticFeedback = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) {
-        debug("firstTime: $firstTime")
         job = launch {
             lazyListState.scrollToItem(component.state.currentSliderImage + 1)
         }
@@ -130,19 +129,19 @@ fun ViewerScreen(
         }
     }
     LaunchedEffect(lazyListState.isScrollInProgress) {
-        component.onAction(ViewerAction.SliderScrollInProgress(lazyListState.isScrollInProgress))
+        component.onAction(ViewerIntent.SliderScrollInProgress(lazyListState.isScrollInProgress))
     }
     LaunchedEffect(pagerState.isScrollInProgress) {
-        component.onAction(ViewerAction.PagerScrollInProgress(pagerState.isScrollInProgress))
+        component.onAction(ViewerIntent.PagerScrollInProgress(pagerState.isScrollInProgress))
     }
     LaunchedEffect(pagerState.targetPage) {
-        component.onAction(ViewerAction.PagerTargetImage(pagerState.targetPage))
+        component.onAction(ViewerIntent.PagerTargetImage(pagerState.targetPage))
     }
     LaunchedEffect(centeredIndex) {
         debug("firstTime: $firstTime")
         if (!firstTime)
             component.onAction(
-                ViewerAction.SlideImage(
+                ViewerIntent.SlideImage(
                     centeredIndex - 1,
                     pagerState.currentPage,
                     pagerState.targetPage
@@ -168,9 +167,10 @@ fun ViewerScreen(
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-        paddingValues
         HorizontalPager(
-            userScrollEnabled = true, state = pagerState
+            contentPadding = paddingValues,
+            userScrollEnabled = true,
+            state = pagerState
         ) {
             val painter = rememberAsyncImagePainter(
                 model = ImageRequest.Builder(context).data(images[it].uri).size(Size.ORIGINAL)
@@ -183,7 +183,7 @@ fun ViewerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .zoomable(zoomState = rememberZoomState(), onTap = {
-                        component.onAction(ViewerAction.Click)
+                        component.onAction(ViewerIntent.Click)
                     }), painter = painter, contentDescription = null
             )
         }
@@ -228,7 +228,7 @@ fun ViewerScreen(
                                 .size(80.dp)
                                 .clickable {
                                     component.onAction(
-                                        ViewerAction.SetCurrentImage(
+                                        ViewerIntent.SetCurrentImage(
                                             imageIndex
                                         )
                                     )

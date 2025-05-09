@@ -7,6 +7,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.dracul.feature_edit.nav_component.EditNoteComponent
+import com.dracul.feature_edit.nav_component.EditTaskComponent
 import com.dracul.feature_main.nav_component.MainComponent
 import com.dracul.feature_viewer.nav_component.ViewerComponent
 import kotlinx.serialization.Serializable
@@ -39,7 +40,8 @@ class RootComponent(
                                 parentId = parentId, index = index
                             )
                         )
-                    }
+                    },
+                    onEditTask = { navigation.pushNew(Configuration.EditTask(it)) }
                 )
             )
 
@@ -62,6 +64,16 @@ class RootComponent(
                     index = config.index
                 )
             )
+            is Configuration.EditTask -> Child.EditTask(
+                EditTaskComponent(
+                    id = config.id,
+                    componentContext = context,
+                    onGoBack = {
+                        onBackClicked()
+                    },
+                    onViewer = { parentId, index -> }
+                )
+            )
         }
 
     fun onDeepLink(initialItemId: Long) = navigation.pushNew(Configuration.EditNote(id = initialItemId))
@@ -71,6 +83,7 @@ class RootComponent(
     sealed class Child {
         data class MainScreen(val component: MainComponent) : Child()
         data class EditNote(val component: EditNoteComponent) : Child()
+        data class EditTask(val component: EditTaskComponent) : Child()
         data class ViewerScreen(val component: ViewerComponent) : Child()
     }
 
@@ -78,6 +91,9 @@ class RootComponent(
     sealed class Configuration {
         @Serializable
         data class EditNote(val id: Long?) : Configuration()
+
+        @Serializable
+        data class EditTask(val id: Long?) : Configuration()
 
         @Serializable
         data object MainScreen : Configuration()

@@ -19,7 +19,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.retainedComponent
 import com.dracul.common.aliases.CommonStrings
-import com.dracul.feature_edit.ui.EditNoteScreen
+import com.dracul.feature_edit.ui.screen.EditNoteScreen
 import com.dracul.feature_main.ui.screen.MainScreen
 import com.dracul.feature_viewer.ui.screen.ViewerScreen
 import com.dracul.notes.components.Prefs
@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity(), KoinComponent {
     private val activityViewModel by viewModels<ActivityViewModel>()
     private val insertNoteUseCase by inject<InsertNoteUseCase>()
 
-    @OptIn(ExperimentalDecomposeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityViewModel
@@ -98,7 +97,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val noteId: Long? = intent?.let {
+        val noteId: Long? = intent.let {
             val id = it.getLongExtra("NOTE_ID", -1)
             if (id == (-1).toLong()) null else id
         }
@@ -129,6 +128,7 @@ fun App(component: RootComponent) {
             when (val instance = child.instance) {
                 is RootComponent.Child.MainScreen -> MainScreen(instance.component)
                 is RootComponent.Child.EditNote -> EditNoteScreen(component = instance.component)
+                is RootComponent.Child.EditTask -> TODO()
                 is RootComponent.Child.ViewerScreen -> ViewerScreen(component  = instance.component)
             }
         }

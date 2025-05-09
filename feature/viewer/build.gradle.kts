@@ -1,12 +1,17 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+
+    }
+}
 android {
-    namespace = "com.dracul.common"
+    namespace = "com.dracul.feature_viewer"
     compileSdk = 35
 
     defaultConfig {
@@ -18,15 +23,13 @@ android {
 
     buildTypes {
         release {
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-
     }
-
-    buildFeatures.compose = true
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -34,23 +37,24 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures.compose = true
 }
 
 dependencies {
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.common)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.jupiter)
-    ksp(libs.androidx.room.compiler)
+    implementation(project(":components:images"))
+    implementation(project(":common"))
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.zoomable)
+    implementation(libs.koin.android)
+    implementation(libs.decompose.jetbrains)
+    implementation(libs.decompose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.runtime.android)
-    implementation(libs.androidx.ui.android)
     implementation(libs.androidx.material3.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.ui.tooling.preview.android)
 }
