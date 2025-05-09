@@ -15,4 +15,8 @@
     <string name="welcome2"><![CDATA[<p><b>Press</b> and <b>hold</b> until you see the <b>bottomsheet</b></p>]]></string>
     <string name="welcome3"><![CDATA[<p><b>Tap</b> on the <b>star</b> to <u>pin</u> the <b>note</b></p>]]></string>
     <string name="permission_dialog_description">Memit needs permission to send notifications for reminders</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="permisson_description">The notification is important for this app. Please grant the permission.</string>
+    <string name="permission_title">Permission</string>
 </resources>
